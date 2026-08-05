@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { hasPermission, ROLES } from '../utils/auth';
+import Confirmar from '../components/Confirmar';
+import ToastLocal from '../components/ToastLocal';
 
 export default function Materias() {
   const [lista, setLista] = useState([]);
   const [planes, setPlanes] = useState([]);
   const [modal, setModal] = useState({ abierto: false, datos: null });
+  const [confirmarEliminar, setConfirmarEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
+  const [alerta, setAlerta] = useState({ mostrar: false, tipo: 'error', mensaje: '' });
   const puedeEditar = hasPermission(["superadmin", "director"]);
+
+  const mostrarAlerta = (tipo, mensaje) => setAlerta({ mostrar: true, tipo, mensaje });
 
   useEffect(() => {
     cargarDatos();
@@ -22,7 +29,7 @@ export default function Materias() {
       setPlanes(resPlanes.data || []);
     } catch (err) {
       console.error('Error cargando materias:', err);
-      alert('No se pudo cargar la lista de materias');
+      mostrarAlerta('error', 'No se pudo cargar la lista de materias');
     }
   };
 
@@ -45,18 +52,26 @@ export default function Materias() {
       cargarDatos();
     } catch (err) {
       console.error('Error guardando materia:', err);
-      alert(err.response?.data?.detail || 'Error al guardar la materia');
+      mostrarAlerta('error', err.response?.data?.detail || 'Error al guardar la materia');
     }
   };
 
   const eliminar = async (id) => {
-    if (!confirm('¿Eliminar esta materia?')) return;
+    setConfirmarEliminar(id);
+  };
+
+  const confirmarBorrar = async () => {
+    if (!confirmarEliminar || eliminando) return;
+    setEliminando(true);
     try {
-      await api.delete(`/api/materias/${id}`);
+      await api.delete(`/api/materias/${confirmarEliminar}`);
+      setConfirmarEliminar(null);
       cargarDatos();
     } catch (err) {
       console.error('Error eliminando:', err);
-      alert(err.response?.data?.detail || 'No se puede eliminar la materia');
+      mostrarAlerta('error', err.response?.data?.detail || 'No se puede eliminar la materia');
+    } finally {
+      setEliminando(false);
     }
   };
 
@@ -149,6 +164,16 @@ export default function Materias() {
           </div>
         </div>
       )}
+      <Confirmar
+        abierto={!!confirmarEliminar}
+        titulo="Eliminar materia"
+        mensaje="¿Estás seguro de eliminar esta materia?"
+        textoConfirmar="Sí, eliminar"
+        cargando={eliminando}
+        onCancelar={() => setConfirmarEliminar(null)}
+        onConfirmar={confirmarBorrar}
+      />
+      <ToastLocal alerta={alerta} onCerrar={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })} />
     </div>
   );
 }

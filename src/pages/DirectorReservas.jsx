@@ -141,6 +141,7 @@ export default function DirectorReservas() {
   const [cargandoSolicitudes, setCargandoSolicitudes] = useState(false);
   const [respondiendo, setRespondiendo] = useState(null);
   const [resaltarSolicitud, setResaltarSolicitud] = useState(null);
+  const [modalRechazoPropuesta, setModalRechazoPropuesta] = useState(null);
 
   const idDirector = getUserId(usuario);
 
@@ -295,13 +296,11 @@ export default function DirectorReservas() {
     }
   }, [location.state]);
 
-  const responderPropuesta = async (solicitud, aceptar) => {
+  const responderPropuesta = async (solicitud, aceptar, observaciones = '') => {
     if (respondiendo) return;
-    let observaciones = '';
     if (!aceptar) {
-      const motivo = window.prompt('Motivo del rechazo de la propuesta (opcional):');
-      if (motivo === null) return;
-      observaciones = motivo || '';
+      setModalRechazoPropuesta({ solicitud, observaciones: '' });
+      return;
     }
     try {
       setRespondiendo(solicitud.id_solicitud);
@@ -309,7 +308,28 @@ export default function DirectorReservas() {
         aceptar,
         observaciones
       });
-      mostrarAlerta('exito', aceptar ? 'Propuesta aceptada. Tu reserva fue aprobada con el horario propuesto.' : 'Propuesta rechazada. El responsable será notificado.');
+      mostrarAlerta('exito', 'Propuesta aceptada. Tu reserva fue aprobada con el horario propuesto.');
+      cargarMisSolicitudes();
+    } catch (err) {
+      console.error('Error al responder propuesta:', err);
+      const detail = err.response?.data?.detail;
+      mostrarAlerta('error', typeof detail === 'string' ? detail : (detail?.mensaje || 'No se pudo responder la propuesta'));
+    } finally {
+      setRespondiendo(null);
+    }
+  };
+
+  const confirmarRechazoPropuesta = async () => {
+    if (!modalRechazoPropuesta) return;
+    const { solicitud, observaciones } = modalRechazoPropuesta;
+    try {
+      setRespondiendo(solicitud.id_solicitud);
+      await api.post(`/api/solicitudes-espacio/${solicitud.id_solicitud}/responder-propuesta`, {
+        aceptar: false,
+        observaciones: observaciones || ''
+      });
+      setModalRechazoPropuesta(null);
+      mostrarAlerta('exito', 'Propuesta rechazada. El responsable será notificado.');
       cargarMisSolicitudes();
     } catch (err) {
       console.error('Error al responder propuesta:', err);
@@ -1027,38 +1047,39 @@ export default function DirectorReservas() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Motivo de la reserva *
+                  Motivo de la reserva (opcional)
                 </label>
                 <textarea
                   name="motivo"
                   rows={3}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Describe el motivo de la reserva..."
-                  required
                   disabled={enviando}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Grupo (opcional)
+                  Grupo *
                 </label>
                 <input
                   type="text"
                   name="grupo"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Ej. DSM 31"
+                  required
                   disabled={enviando}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tutor (opcional)
+                  Tutor *
                 </label>
                 <input
                   type="text"
                   name="tutor"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Nombre del tutor"
+                  required
                   disabled={enviando}
                 />
               </div>
@@ -1095,6 +1116,54 @@ export default function DirectorReservas() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {modalRechazoPropuesta && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 animate-fadeIn" onClick={() => setModalRechazoPropuesta(null)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-fadeIn">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">Rechazar propuesta</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  La propuesta de horario será rechazada y el responsable será notificado.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo (opcional)</label>
+              <textarea
+                value={modalRechazoPropuesta.observaciones || ''}
+                onChange={(e) => setModalRechazoPropuesta({ ...modalRechazoPropuesta, observaciones: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+                placeholder="Describe el motivo del rechazo..."
+                disabled={respondiendo}
+              />
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setModalRechazoPropuesta(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+                disabled={respondiendo}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarRechazoPropuesta}
+                disabled={respondiendo}
+                className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+              >
+                {respondiendo ? 'Rechazando...' : 'Confirmar rechazo'}
+              </button>
+            </div>
           </div>
         </div>
       )}

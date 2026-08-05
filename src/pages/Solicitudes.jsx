@@ -23,6 +23,8 @@ export default function Solicitudes() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [busquedaGrupo, setBusquedaGrupo] = useState('');
+  const [busquedaTutor, setBusquedaTutor] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
   const [porPagina, setPorPagina] = useState(10);
   const [modalNueva, setModalNueva] = useState(false);
@@ -45,9 +47,12 @@ export default function Solicitudes() {
     return () => socket.off('actualizacion', cargarDatos);
   }, []);
 
-  const solicitudesFiltradas = filtroEstado === 'todos'
-    ? solicitudes
-    : solicitudes.filter(s => s.estado === filtroEstado);
+  const solicitudesFiltradas = solicitudes.filter(s => {
+    if (filtroEstado !== 'todos' && s.estado !== filtroEstado) return false;
+    if (busquedaGrupo && !(s.sigla_grupo || '').toLowerCase().includes(busquedaGrupo.toLowerCase())) return false;
+    if (busquedaTutor && !(s.tutor_grupo || '').toLowerCase().includes(busquedaTutor.toLowerCase())) return false;
+    return true;
+  });
 
   const totalPaginas = Math.max(1, Math.ceil(solicitudesFiltradas.length / porPagina));
   const paginaSegura = Math.min(paginaActual, totalPaginas);
@@ -107,6 +112,30 @@ export default function Solicitudes() {
               {est === 'todos' ? 'Todos' : est} ({est === 'todos' ? solicitudes.length : solicitudes.filter(s => s.estado === est).length})
             </button>
           ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 ml-auto">
+          <input
+            type="text"
+            value={busquedaGrupo}
+            onChange={(e) => { setBusquedaGrupo(e.target.value); setPaginaActual(1); }}
+            placeholder="Buscar grupo..."
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+          />
+          <input
+            type="text"
+            value={busquedaTutor}
+            onChange={(e) => { setBusquedaTutor(e.target.value); setPaginaActual(1); }}
+            placeholder="Buscar tutor..."
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+          />
+          {(busquedaGrupo || busquedaTutor) && (
+            <button
+              onClick={() => { setBusquedaGrupo(''); setBusquedaTutor(''); setPaginaActual(1); }}
+              className="px-3 py-1.5 text-sm text-[#701330] hover:bg-[#701330]/10 rounded-lg font-medium"
+            >
+              Limpiar
+            </button>
+          )}
         </div>
       </div>
 

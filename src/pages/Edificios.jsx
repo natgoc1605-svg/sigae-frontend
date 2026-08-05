@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { isSuperAdmin } from '../utils/auth';
 import api from '../api/axios';
+import Confirmar from '../components/Confirmar';
 
 export default function Edificios() {
   const { usuario } = useAuth();
@@ -14,7 +15,9 @@ export default function Edificios() {
   const [plantasResponsable, setPlantasResponsable] = useState('ambas');
   const [cargando, setCargando] = useState(false);
   const [cargandoDirectores, setCargandoDirectores] = useState(false);
-  const [mensaje, setMensaje] = useState(null);
+    const [mensaje, setMensaje] = useState(null);
+  const [responsableEliminar, setResponsableEliminar] = useState(null);
+  const [eliminandoResponsable, setEliminandoResponsable] = useState(false);
   const [edificioEliminar, setEdificioEliminar] = useState(null);
   const [contrasenaEliminar, setContrasenaEliminar] = useState('');
   const [eliminando, setEliminando] = useState(false);
@@ -245,16 +248,24 @@ export default function Edificios() {
     }
   };
 
-  const eliminarResponsable = async (idEdificio, idUsuario) => {
-    if (!window.confirm('Eliminar este responsable?')) return;
+    const eliminarResponsable = async (idEdificio, idUsuario) => {
+    setResponsableEliminar({ idEdificio, idUsuario });
+  };
+
+  const confirmarEliminarResponsable = async () => {
+    if (!responsableEliminar || eliminandoResponsable) return;
+    setEliminandoResponsable(true);
     try {
-      await api.delete(`/api/edificios/${idEdificio}/responsables/${idUsuario}`);
+      await api.delete(`/api/edificios/${responsableEliminar.idEdificio}/responsables/${responsableEliminar.idUsuario}`);
       mostrarMensaje('exito', 'Responsable eliminado correctamente');
-      cargarResponsables(idEdificio);
+      setResponsableEliminar(null);
+      cargarResponsables(responsableEliminar.idEdificio);
       cargar();
     } catch (err) {
       const errorMsg = err.response?.data?.detail || 'Error al eliminar responsable';
       mostrarMensaje('error', errorMsg);
+    } finally {
+      setEliminandoResponsable(false);
     }
   };
 
@@ -797,6 +808,16 @@ export default function Edificios() {
           </div>
         </div>
       )}
+
+      <Confirmar
+        abierto={!!responsableEliminar}
+        titulo="Eliminar responsable"
+        mensaje="¿Estás seguro de eliminar este responsable del edificio?"
+        textoConfirmar="Sí, eliminar"
+        cargando={eliminandoResponsable}
+        onCancelar={() => setResponsableEliminar(null)}
+        onConfirmar={confirmarEliminarResponsable}
+      />
 
       <style>{`
         @keyframes fadeIn {

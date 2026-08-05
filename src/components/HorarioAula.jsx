@@ -189,8 +189,11 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
   const [duracionSolicitud, setDuracionSolicitud] = useState(1);
   const [maxHorasSolicitud, setMaxHorasSolicitud] = useState(1);
   const [enviandoSolicitud, setEnviandoSolicitud] = useState(false);
+  const [confirmar, setConfirmar] = useState(null);
 
   const [edificiosPermitidos, setEdificiosPermitidos] = useState([]);
+  const [filtroGrupo, setFiltroGrupo] = useState('');
+  const [soloOtrasDocencias, setSoloOtrasDocencias] = useState(false);
 
   const esSuperAdmin = isSuperAdmin(usuario);
   const esDirector = isDirector(usuario);
@@ -357,13 +360,14 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
   const eliminarHorarioTurno = async () => {
     if (!permisoReal) return;
-    if (!window.confirm(`¿Eliminar todo el horario del turno ${turnoSeleccionado}?`)) return;
     try {
       await api.delete(`/api/infraestructura/aula/${aula.id_aula}/horario?turno=${turnoSeleccionado}`);
+      setConfirmar(null);
       await cargarHorario();
       await actualizarEstadoAula();
       mostrarAlerta('exito', `Horario del turno ${turnoSeleccionado} eliminado.`);
     } catch (err) {
+      setConfirmar(null);
       mostrarAlerta('error', 'No se pudo eliminar.');
     }
   };
@@ -380,13 +384,14 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
   const eliminarAsignacion = async (id) => {
     if (!permisoReal) return;
-    if (!window.confirm('¿Eliminar esta asignación?')) return;
     try {
       await api.delete(`/api/horarios/${id}`);
+      setConfirmar(null);
       await cargarHorario();
       await actualizarEstadoAula();
       mostrarAlerta('exito', 'Asignación eliminada');
     } catch (err) {
+      setConfirmar(null);
       mostrarAlerta('error', 'No se pudo eliminar');
     }
   };
@@ -604,6 +609,16 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
   const tutorGrupo = horario.find(e => !e.pendiente && e.tutor_grupo && e.tutor_grupo !== 'Sin asignar')?.tutor_grupo || 'Sin tutor';
   const grupoDelHorario = horario.find(e => !e.pendiente && e.sigla_grupo && e.sigla_grupo !== '---')?.sigla_grupo || 'Sin grupo';
 
+  const idUsuarioActual = usuario?.id;
+  const gruposDelHorario = Array.from(new Set(
+    horario.filter(e => !e.pendiente && e.sigla_grupo && e.sigla_grupo !== '---').map(e => e.sigla_grupo)
+  )).sort();
+  const horarioFiltrado = horario.filter(e => {
+    if (soloOtrasDocencias && e.id_usuario && e.id_usuario === idUsuarioActual) return false;
+    if (filtroGrupo) return (e.sigla_grupo || '').toLowerCase() === filtroGrupo.toLowerCase();
+    return true;
+  });
+
   if (!aula) {
     if (cargandoAula) {
       return (
@@ -693,7 +708,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
             
             {permisoReal && (
               <>
-                <button onClick={eliminarHorarioTurno} className="px-4 py-2 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                <button onClick={() => setConfirmar({ titulo: 'Eliminar horario del turno', mensaje: `¿Eliminar todo el horario del turno ${turnoSeleccionado}? Se eliminarán también las solicitudes pendientes de este turno.`, accion: eliminarHorarioTurno, confirmarTexto: 'Sí, eliminar', tipo: 'peligro' })} className="px-4 py-2 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   Eliminar
                 </button>
@@ -748,10 +763,31 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
               Ocupación: {ocupacion.porcentaje}% ({ocupacion.ocupados}/{ocupacion.total})
             </span>
             <span className="text-gray-300">|</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-              Tutor: {tutorGrupo}
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium text-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+              Grupo: {grupoDelHorario}
             </span>
+            {(gruposDelHorario.length > 1 || true) && (
+              <>
+                <span className="text-gray-300">|</span>
+                <select
+                  value={filtroGrupo}
+                  onChange={(e) => setFiltroGrupo(e.target.value)}
+                  className="px-2 py-0.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+                  title="Filtrar por grupo"
+                >
+                  <option value="">Todos los grupos</option>
+                  {gruposDelHorario.map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+                <button
+                  onClick={() => setSoloOtrasDocencias(v => !v)}
+                  className={`px-2.5 py-0.5 text-xs font-medium rounded-lg border transition-all duration-200 ${soloOtrasDocencias ? 'bg-[#701330] text-white border-[#701330]' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  title="Ocultar tus propias reservas para ver solo las de otras docencias"
+                >
+                  Otras docencias
+                </button>
+              </>
+            )}
             <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium text-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
               Grupo: {grupoDelHorario}
@@ -791,7 +827,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                     <tr key={bloque.inicio} className="hover:bg-gray-50/70 transition-colors duration-200">
                       <td className="border-b border-gray-100 p-3 text-sm font-medium text-gray-700 whitespace-nowrap">{bloque.hora}</td>
                       {DIAS.map(dia => {
-                        const evento = horario.find(e => {
+                        const evento = horarioFiltrado.find(e => {
                           const diaCoincide = normalizarTexto(e.dia_semana || e.dia) === normalizarTexto(dia);
                           const horaCoincide = normalizarHora(e.hora_inicio) === normalizarHora(bloque.inicio);
                           return diaCoincide && horaCoincide;
@@ -807,7 +843,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                           const nombreMat = evento.nombre_materia || evento.sigla_materia || '';
                           const siglaMat = evento.sigla_materia || '';
                           const colorGuardado = evento.color || evento.materia_color || null;
-                          colores = obtenerColorMateria(nombreMat, siglaMat, colorGuardado);
+                          const creadorSuperAdmin = evento.rol_creador === 'superadmin';
+                          const reservaDeOtroDirector = esDirector && !esSuperAdmin && evento.id_usuario && evento.id_usuario !== idDirector && !creadorSuperAdmin;
+                          if (reservaDeOtroDirector) {
+                            colores = { fondo: '#B0BEC5', borde: '#78909C', texto: '#FFFFFF' };
+                          } else {
+                            colores = obtenerColorMateria(nombreMat, siglaMat, colorGuardado);
+                          }
                         }
                         
                         const esPendiente = !!evento?.pendiente;
@@ -862,6 +904,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                     <span>{evento.sigla_docente || evento.nombre_docente || 'Sin docente'}</span>
                                   )}
                                 </div>
+                                {!esPendiente && evento.nombre_creador && (
+                                  <div className="flex flex-wrap items-center gap-x-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
+                                    <span className="px-1.5 py-0.5 rounded bg-black/10">
+                                      Responsable: {evento.nombre_creador}
+                                    </span>
+                                  </div>
+                                )}
                                 <div className="flex flex-wrap items-center gap-x-2 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
                                   {!esPendiente && evento.aula_clase && <span className="bg-white/20 px-1.5 py-0.5 rounded">Aula: {evento.aula_clase}</span>}
                                 </div>
@@ -875,7 +924,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                     <button onClick={(e) => { e.stopPropagation(); abrirEditarAsignacion(evento, dia, bloque); }} className="p-1 rounded hover:bg-gray-100" title="Editar">
                                       <svg className="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
-                                    <button onClick={(e) => { e.stopPropagation(); eliminarAsignacion(evento.id); }} className="p-1 rounded hover:bg-red-50" title="Eliminar">
+                                    <button onClick={(e) => { e.stopPropagation(); setConfirmar({ titulo: 'Eliminar asignación', mensaje: '¿Eliminar esta asignación del horario?', accion: () => eliminarAsignacion(evento.id), confirmarTexto: 'Sí, eliminar', tipo: 'peligro' }); }} className="p-1 rounded hover:bg-red-50" title="Eliminar">
                                       <svg className="w-3 h-3 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                   </div>
@@ -1220,33 +1269,34 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Motivo de la reserva *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Motivo de la reserva (opcional)</label>
                 <textarea
                   name="motivo"
                   rows={3}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Describe el motivo de la reserva..."
-                  required
                   disabled={enviandoSolicitud}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grupo (opcional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Grupo *</label>
                 <input
                   type="text"
                   name="grupo"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Ej. DSM 31"
+                  required
                   disabled={enviandoSolicitud}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tutor (opcional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tutor *</label>
                 <input
                   type="text"
                   name="tutor"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
                   placeholder="Nombre del tutor"
+                  required
                   disabled={enviandoSolicitud}
                 />
               </div>
@@ -1277,6 +1327,39 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {confirmar && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 animate-fadeIn" onClick={() => setConfirmar(null)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-modalIn">
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${confirmar.tipo === 'peligro' ? 'bg-red-100' : 'bg-amber-100'}`}>
+                <svg className={`w-6 h-6 ${confirmar.tipo === 'peligro' ? 'text-red-600' : 'text-amber-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">{confirmar.titulo}</h3>
+                <p className="text-sm text-gray-600 mt-1">{confirmar.mensaje}</p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setConfirmar(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmar.accion}
+                className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700"
+              >
+                {confirmar.confirmarTexto || 'Confirmar'}
+              </button>
+            </div>
           </div>
         </div>
       )}

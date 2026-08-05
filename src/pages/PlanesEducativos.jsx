@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { hasPermission, ROLES } from '../utils/auth';
+import Confirmar from '../components/Confirmar';
+import ToastLocal from '../components/ToastLocal';
 
 export default function PlanesEducativos() {
   const [lista, setLista] = useState([]);
   const [carreras, setCarreras] = useState([]);
   const [modal, setModal] = useState({ abierto: false, datos: null });
+  const [confirmarEliminar, setConfirmarEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
+  const [alerta, setAlerta] = useState({ mostrar: false, tipo: 'error', mensaje: '' });
   const puedeEditar = hasPermission(["superadmin", "director"]);
+
+  const mostrarAlerta = (tipo, mensaje) => setAlerta({ mostrar: true, tipo, mensaje });
 
   useEffect(() => {
     cargarDatos();
@@ -22,7 +29,7 @@ export default function PlanesEducativos() {
       setCarreras(resCarreras.data || []);
     } catch (err) {
       console.error('Error cargando planes:', err);
-      alert('No se pudo cargar la lista de planes');
+      mostrarAlerta('error', 'No se pudo cargar la lista de planes');
     }
   };
 
@@ -44,18 +51,26 @@ export default function PlanesEducativos() {
       cargarDatos();
     } catch (err) {
       console.error('Error guardando:', err);
-      alert(err.response?.data?.detail || 'Error al guardar el plan');
+      mostrarAlerta('error', err.response?.data?.detail || 'Error al guardar el plan');
     }
   };
 
   const eliminar = async (id) => {
-    if (!confirm('¿Estás seguro de eliminar este plan?')) return;
+    setConfirmarEliminar(id);
+  };
+
+  const confirmarBorrar = async () => {
+    if (!confirmarEliminar || eliminando) return;
+    setEliminando(true);
     try {
-      await api.delete(`/api/planes-educativos/${id}`);
+      await api.delete(`/api/planes-educativos/${confirmarEliminar}`);
+      setConfirmarEliminar(null);
       cargarDatos();
     } catch (err) {
       console.error('Error eliminando:', err);
-      alert(err.response?.data?.detail || 'No se puede eliminar el plan');
+      mostrarAlerta('error', err.response?.data?.detail || 'No se puede eliminar el plan');
+    } finally {
+      setEliminando(false);
     }
   };
 
@@ -137,6 +152,16 @@ export default function PlanesEducativos() {
           </div>
         </div>
       )}
+      <Confirmar
+        abierto={!!confirmarEliminar}
+        titulo="Eliminar plan"
+        mensaje="¿Estás seguro de eliminar este plan educativo?"
+        textoConfirmar="Sí, eliminar"
+        cargando={eliminando}
+        onCancelar={() => setConfirmarEliminar(null)}
+        onConfirmar={confirmarBorrar}
+      />
+      <ToastLocal alerta={alerta} onCerrar={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })} />
     </div>
   );
 }

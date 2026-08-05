@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { hasPermission, ROLES } from '../utils/auth';
+import ToastLocal from '../components/ToastLocal';
 
 function IconoAula({ tipo = '' }) {
   const cls = "w-8 h-8";
@@ -46,6 +47,9 @@ export default function Aulas() {
   const [aulaEliminar, setAulaEliminar] = useState(null);
   const [contrasenaEliminar, setContrasenaEliminar] = useState('');
   const [eliminando, setEliminando] = useState(false);
+  const [alerta, setAlerta] = useState({ mostrar: false, tipo: 'error', mensaje: '' });
+
+  const mostrarAlerta = (tipo, mensaje) => setAlerta({ mostrar: true, tipo, mensaje });
 
   const edificiosPermitidos = useMemo(() => {
     if (!esDirector || asignaciones.length === 0) return edificios;
@@ -102,7 +106,7 @@ export default function Aulas() {
       }
     } catch (err) {
       console.error("Error al cargar:", err);
-      alert("No se pudo cargar la información");
+      mostrarAlerta('error', 'No se pudo cargar la información');
     } finally {
       setCargando(false);
     }
@@ -141,7 +145,7 @@ export default function Aulas() {
       cargarDatos();
     } catch (err) {
       console.error("Error al guardar:", err);
-      alert(err.response?.data?.detail || "No se pudo guardar el registro");
+      mostrarAlerta('error', err.response?.data?.detail || 'No se pudo guardar el registro');
     }
   };
 
@@ -156,7 +160,7 @@ export default function Aulas() {
     e.preventDefault();
     if (!aulaEliminar || eliminando) return;
     if (!contrasenaEliminar) {
-      alert('Ingresa tu contraseña para confirmar la eliminación');
+      mostrarAlerta('error', 'Ingresa tu contraseña para confirmar la eliminación');
       return;
     }
     setEliminando(true);
@@ -167,7 +171,7 @@ export default function Aulas() {
       cargarDatos();
     } catch (err) {
       console.error("Error al eliminar:", err);
-      alert(err.response?.data?.detail || "No se pudo eliminar");
+      mostrarAlerta('error', err.response?.data?.detail || 'No se pudo eliminar');
     } finally {
       setEliminando(false);
     }
@@ -542,6 +546,7 @@ export default function Aulas() {
           </div>
         </div>
       )}
+      <ToastLocal alerta={alerta} onCerrar={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })} />
     </div>
   );
 }
