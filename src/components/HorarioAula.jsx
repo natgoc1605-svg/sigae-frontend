@@ -162,6 +162,16 @@ function obtenerColorContraste(hexColor) {
   return esColorClaro(hexColor) ? '#2D3748' : '#FFFFFF';
 }
 
+function etiquetaRol(rol) {
+  const mapa = {
+    superadmin: 'Admin',
+    director: 'Director',
+    coordinador: 'Coordinador',
+    docente: 'Docente'
+  };
+  return mapa[rol] ? ` · ${mapa[rol]}` : '';
+}
+
 export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = false, onActualizarAula }) {
   const { usuario } = useAuth();
   const { id: idParam } = useParams();
@@ -906,8 +916,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                 </div>
                                 {!esPendiente && evento.nombre_creador && (
                                   <div className="flex flex-wrap items-center gap-x-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
-                                    <span className="px-1.5 py-0.5 rounded bg-black/10">
-                                      Responsable: {evento.nombre_creador}
+                                    <span className={`px-1.5 py-0.5 rounded font-medium ${reservaDeOtroDirector ? 'bg-amber-500/90 text-white' : 'bg-black/10'}`}>
+                                      {reservaDeOtroDirector && (
+                                        <svg className="w-3 h-3 inline-block mr-0.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                      )}
+                                      Responsable: {evento.nombre_creador}{etiquetaRol(evento.rol_creador)}
                                     </span>
                                   </div>
                                 )}
@@ -1033,6 +1048,26 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                   </div>
                 </div>
               )}
+
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-gray-600 bg-white/70 px-3 py-2 rounded-lg border border-gray-200/60">
+                <span className="font-semibold text-gray-700">Leyenda:</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#B0BEC5', border: '1px solid #78909C' }}></span>
+                  Otra docencia (incidencia)
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded bg-amber-400"></span>
+                  En espera de aprobación
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="px-1.5 py-0.5 rounded text-white bg-amber-500 text-[9px] font-bold">⚠</span>
+                  Responsable de la reserva (celda)
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded bg-gray-300"></span>
+                  Bloque del otro turno
+                </span>
+              </div>
 
               <div className="mt-4 text-xs text-gray-500 text-center bg-white/70 py-2 rounded-lg">
                 {getAyudaTexto()}

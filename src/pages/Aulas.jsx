@@ -44,6 +44,7 @@ export default function Aulas() {
   });
   const [cargando, setCargando] = useState(true);
   const [filtroPlanta, setFiltroPlanta] = useState('');
+  const [vista, setVista] = useState('todos');
   const [aulaEliminar, setAulaEliminar] = useState(null);
   const [contrasenaEliminar, setContrasenaEliminar] = useState('');
   const [eliminando, setEliminando] = useState(false);
@@ -66,8 +67,16 @@ export default function Aulas() {
     return ['baja', 'alta'];
   }, [asignaciones, form.id_edificio, esDirector]);
 
+  const esLaboratorio = (a) => {
+    const t = (a.nombre_tipo || '').toLowerCase();
+    return a.id_tipo === 2 || t.includes('laboratorio') || t.includes('lab');
+  };
+
   const listaFiltrada = useMemo(() => {
     let items = lista;
+    if (vista !== 'todos') {
+      items = items.filter(a => vista === 'laboratorios' ? esLaboratorio(a) : !esLaboratorio(a));
+    }
     if (busqueda.trim()) {
       const q = busqueda.trim().toLowerCase();
       items = items.filter(a =>
@@ -80,7 +89,7 @@ export default function Aulas() {
       items = items.filter(a => a.planta === filtroPlanta);
     }
     return items;
-  }, [lista, busqueda, filtroPlanta]);
+  }, [lista, busqueda, filtroPlanta, vista]);
 
   const cargarDatos = async () => {
     try {
@@ -177,7 +186,7 @@ export default function Aulas() {
     }
   };
 
-  const abrirModal = (aula = null) => {
+  const abrirModal = (aula = null, tipoPreseleccionado = '') => {
     setEditar(aula);
     setForm(aula ? {
       nombre_aula: aula.nombre_aula || '',
@@ -188,7 +197,7 @@ export default function Aulas() {
     } : {
       nombre_aula: '',
       id_edificio: '',
-      id_tipo: '',
+      id_tipo: tipoPreseleccionado || '',
       planta: '',
       capacidad: ''
     });
@@ -224,16 +233,16 @@ export default function Aulas() {
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
       <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-[#701330]">Gestión de Aulas</h2>
+          <h2 className="text-2xl font-bold text-[#701330]">{vista === 'laboratorios' ? 'Gestión de Laboratorios' : 'Gestión de Aulas'}</h2>
           <p className="text-sm text-gray-500 mt-1">
             {esDirector ? 'Solo puedes administrar las aulas de los espacios que te fueron asignados' : 'Administra todas las aulas del campus'}
           </p>
         </div>
-        <button onClick={() => abrirModal()} className="btn btn-primary flex items-center gap-2">
+        <button onClick={() => abrirModal(null, vista === 'laboratorios' ? String(tiposAula.find(t => (t.nombre_tipo || '').toLowerCase().includes('lab'))?.id_tipo || '') : '')} className="btn btn-primary flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Nueva Aula
+          {vista === 'laboratorios' ? 'Nuevo Laboratorio' : 'Nueva Aula'}
         </button>
       </div>
 
@@ -252,7 +261,7 @@ export default function Aulas() {
           </svg>
           <input
             type="text"
-            placeholder="Buscar aula, edificio o tipo..."
+            placeholder={vista === 'laboratorios' ? 'Buscar laboratorio, edificio o tipo...' : 'Buscar aula, edificio o tipo...'}
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/20 text-sm"
@@ -267,8 +276,29 @@ export default function Aulas() {
           <option value="baja">Planta baja</option>
           <option value="alta">Planta alta</option>
         </select>
+        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 self-center">
+          <button
+            onClick={() => setVista('todos')}
+            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${vista === 'todos' ? 'bg-white text-[#701330] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            Todo
+          </button>
+          <button
+            onClick={() => setVista('aulas')}
+            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${vista === 'aulas' ? 'bg-white text-[#701330] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            Aulas
+          </button>
+          <button
+            onClick={() => setVista('laboratorios')}
+            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1.5 ${vista === 'laboratorios' ? 'bg-white text-[#701330] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+            Laboratorios
+          </button>
+        </div>
         <span className="text-sm text-gray-500 self-center ml-auto">
-          {listaFiltrada.length} aula{listaFiltrada.length !== 1 ? 's' : ''}
+          {listaFiltrada.length} {vista === 'laboratorios' ? 'laboratorio' : 'aula'}{listaFiltrada.length !== 1 ? 's' : ''}
         </span>
       </div>
 
@@ -282,7 +312,7 @@ export default function Aulas() {
           <svg className="w-14 h-14 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3" />
           </svg>
-          <p className="text-gray-500">No hay aulas que coincidan con la búsqueda</p>
+          <p className="text-gray-500">No hay {vista === 'laboratorios' ? 'laboratorios' : 'aulas'} que coincidan con la búsqueda</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
