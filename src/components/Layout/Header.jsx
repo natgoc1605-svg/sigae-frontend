@@ -294,8 +294,19 @@ export default function Header() {
                       }`}
                     >
                       <div className="flex items-start gap-2">
-                        <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${!notif.leida ? 'bg-[#701330]' : 'bg-gray-300'}`}></div>
+                        <div className="flex-shrink-0 mt-0.5">
+                          {notif.emisor_foto ? (
+                            <img src={notif.emisor_foto} alt={notif.emisor_nombre || 'Usuario'} className="w-7 h-7 rounded-full object-cover border border-gray-200" />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-[#701330]/10 flex items-center justify-center text-[#701330] font-bold text-xs">
+                              {getInitials(notif.emisor_nombre || 'U')}
+                            </div>
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0">
+                          {notif.emisor_nombre && (
+                            <p className="text-xs font-semibold text-gray-800">{notif.emisor_nombre}</p>
+                          )}
                           <p className={`text-sm ${!notif.leida ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
                             {notif.mensaje || notif.titulo || 'Sin mensaje'}
                           </p>
