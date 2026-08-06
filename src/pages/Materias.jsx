@@ -76,70 +76,100 @@ export default function Materias() {
   };
 
   return (
-    <div>
-      <h2>Gestión de Materias</h2>
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-[#701330]">Gestión de Materias</h2>
+          <p className="text-sm text-gray-500 mt-1">Catálogo de materias y su plan educativo</p>
+        </div>
+        {puedeEditar && (
+          <button
+            onClick={() => setModal({ abierto: true, datos: null })}
+            className="px-4 py-2 bg-[#701330] hover:bg-[#912347] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva Materia
+          </button>
+        )}
+      </div>
 
-      {puedeEditar && (
-        <button onClick={() => setModal({ abierto: true, datos: null })}>
-          Nueva Materia
-        </button>
-      )}
-
-      <table border="1" cellPadding="8" cellSpacing="0" style={{ width: '100%', marginTop: '1rem' }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Plan Educativo</th>
-            <th>Color</th>
-            {puedeEditar && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {lista.length === 0 ? (
-            <tr><td colSpan="5" align="center">No hay materias registradas</td></tr>
-          ) : (
-            lista.map(m => (
-              <tr key={m.id_materia}>
-                <td>{m.id_materia}</td>
-                <td>{m.nombre_materia}</td>
-                <td>{m.nombre_plan}</td>
-                <td><div style={{ width: '20px', height: '20px', background: m.color, border: '1px solid #ccc' }}></div></td>
-                {puedeEditar && (
-                  <td>
-                    <button onClick={() => setModal({ abierto: true, datos: m })}>Editar</button>
-                    <button onClick={() => eliminar(m.id_materia)} style={{ marginLeft: '0.5rem', color: 'red' }}>Eliminar</button>
-                  </td>
-                )}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-4 text-left text-sm font-semibold text-gray-700">ID</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-700">Nombre</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-700">Plan Educativo</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-700">Color</th>
+                {puedeEditar && <th className="p-4 text-right text-sm font-semibold text-gray-700">Acciones</th>}
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {lista.length === 0 ? (
+                <tr>
+                  <td colSpan={puedeEditar ? 5 : 4} className="p-4 text-center text-gray-500">No hay materias registradas</td>
+                </tr>
+              ) : (
+                lista.map(m => (
+                  <tr key={m.id_materia} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                    <td className="p-4 text-sm text-gray-500">{m.id_materia}</td>
+                    <td className="p-4 font-medium text-gray-800">{m.nombre_materia}</td>
+                    <td className="p-4 text-sm text-gray-600">{m.nombre_plan}</td>
+                    <td className="p-4">
+                      <div className="w-5 h-5 rounded border border-gray-200" style={{ background: m.color }}></div>
+                    </td>
+                    {puedeEditar && (
+                      <td className="p-4">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setModal({ abierto: true, datos: m })}
+                            className="px-3 py-1.5 text-xs font-medium text-[#701330] bg-[#701330]/5 hover:bg-[#701330]/10 rounded-lg transition-colors"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => eliminar(m.id_materia)}
+                            className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Modal Formulario */}
       {modal.abierto && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'white', padding: '2rem', borderRadius: '4px', width: '400px' }}>
-            <h3>{modal.datos ? 'Editar Materia' : 'Nueva Materia'}</h3>
-            <form onSubmit={guardar}>
-              <div style={{ marginBottom: '1rem' }}>
-                <label>Nombre de la Materia:</label><br />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{modal.datos ? 'Editar Materia' : 'Nueva Materia'}</h3>
+            <form onSubmit={guardar} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Materia:</label>
                 <input
                   type="text"
                   name="nombre_materia"
                   defaultValue={modal.datos?.nombre_materia || ''}
                   required
-                  style={{ width: '100%', padding: '0.5rem' }}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 bg-white text-sm"
                 />
               </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <label>Plan Educativo:</label><br />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Plan Educativo:</label>
                 <select
                   name="id_plan"
                   defaultValue={modal.datos?.id_plan || ''}
                   required
-                  style={{ width: '100%', padding: '0.5rem' }}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 bg-white text-sm"
                 >
                   <option value="">Seleccione un plan</option>
                   {planes.map(p => (
@@ -147,18 +177,29 @@ export default function Materias() {
                   ))}
                 </select>
               </div>
-              <div style={{ marginBottom: '1rem' }}>
-                <label>Color:</label><br />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Color:</label>
                 <input
                   type="color"
                   name="color"
                   defaultValue={modal.datos?.color || '#701330'}
-                  style={{ width: '100%', height: '40px' }}
+                  className="w-full h-10 rounded-lg border border-gray-300 cursor-pointer bg-white"
                 />
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setModal({ abierto: false, datos: null })}>Cancelar</button>
-                <button type="submit">Guardar</button>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setModal({ abierto: false, datos: null })}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white bg-[#701330] hover:bg-[#912347]"
+                >
+                  Guardar
+                </button>
               </div>
             </form>
           </div>

@@ -701,7 +701,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Cabecera */}
-        <div className="px-6 py-4 border-b border-[#701330]/20 flex flex-wrap items-center justify-between gap-4 bg-white">
+        <div className="px-4 sm:px-6 py-4 border-b border-[#701330]/20 flex flex-wrap items-center justify-between gap-4 bg-white">
           <div className="flex items-center gap-4 flex-wrap">
             <h2 className="text-2xl font-bold text-[#701330]">{aula.nombre_aula}</h2>
             
@@ -1080,7 +1080,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
       {/* Modales */}
       {modal.abierto && permisoReal && (
         <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-7 shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 shadow-xl">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{modal.tipo === 'nueva' ? 'Nueva Asignación' : 'Editar Asignación'}</h3>
@@ -1148,7 +1148,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
       {modalTutor.abierto && permisoReal && (
         <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-[70] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-7 shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 shadow-xl">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Asignar Tutor</h3>
@@ -1195,7 +1195,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
       {modalSolicitarReserva.abierto && (
         <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-7 shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 shadow-xl">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Solicitar Reserva</h3>

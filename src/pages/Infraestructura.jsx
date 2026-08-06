@@ -331,7 +331,7 @@ export default function Infraestructura() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <header className="bg-white shadow-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <nav className="text-sm text-gray-500 mb-3">
             <span>SIGAE</span>
             <span className="mx-2">/</span>
@@ -381,7 +381,7 @@ export default function Infraestructura() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <section className="mb-10">
           <h3 className="text-sm uppercase font-semibold text-gray-500 mb-4 tracking-wider">
             {esSuperAdmin ? 'Edificios / Docencias' : 'Mis Edificios'}

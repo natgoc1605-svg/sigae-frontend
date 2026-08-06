@@ -71,9 +71,13 @@ export default function Usuarios() {
     return usuarios.filter(u => {
       if (filtroRol && u.rol !== filtroRol) return false;
       if (!q) return true;
-      return (u.nombre || '').toLowerCase().includes(q) ||
-        (u.email_institucional || '').toLowerCase().includes(q) ||
-        (u.nombre_carrera || '').toLowerCase().includes(q);
+      const coinciden = (campo) => (campo || '').toLowerCase().includes(q);
+      return coinciden(u.nombre) ||
+        coinciden(u.email_institucional) ||
+        coinciden(u.nombre_carrera) ||
+        coinciden(u.sigla) ||
+        coinciden(u.rol) ||
+        coinciden(etiquetaRol(u.rol));
     });
   }, [usuarios, busqueda, filtroRol]);
 
@@ -169,7 +173,7 @@ export default function Usuarios() {
           </svg>
           <input
             type="text"
-            placeholder="Buscar por nombre, correo o carrera..."
+            placeholder="Buscar por nombre, correo, carrera o rol..."
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/20 text-sm"
@@ -265,7 +269,7 @@ export default function Usuarios() {
       {modal.abierto && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 animate-fadeIn" onClick={guardando ? undefined : () => setModal({ abierto: false, editar: null })}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-fadeIn">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-fadeIn">
             <h3 className="text-lg font-bold text-gray-800 mb-1">
               {modal.editar ? 'Editar Usuario' : 'Nuevo Usuario'}
             </h3>
@@ -366,7 +370,7 @@ export default function Usuarios() {
       {cambiarContrasena && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 animate-fadeIn" onClick={guardando ? undefined : () => setCambiarContrasena(null)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-fadeIn">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-fadeIn">
             <h3 className="text-lg font-bold text-gray-800">Restablecer contraseña</h3>
             <p className="text-sm text-gray-600 mt-1">
               Nueva contraseña para <span className="font-medium text-gray-800">{cambiarContrasena.nombre}</span>

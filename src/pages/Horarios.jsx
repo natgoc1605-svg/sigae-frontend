@@ -64,7 +64,7 @@ export default function Horarios() {
 
   return (
     <div className="bg-gray-50 min-h-screen w-full">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 shadow-sm">
         <div className="max-w-7xl mx-auto">
           <nav className="text-sm text-gray-500 mb-2">
             <span>SIGAE</span>
@@ -76,7 +76,7 @@ export default function Horarios() {
         </div>
       </div>
 
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+      <div className="px-4 sm:px-6 py-6 max-w-7xl mx-auto">
         {cargando ? (
           <div className="py-20 text-center text-gray-500 animate-pulse">Cargando aulas...</div>
         ) : (
