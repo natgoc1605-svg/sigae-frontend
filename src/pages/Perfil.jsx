@@ -74,7 +74,27 @@ export default function Perfil() {
       return;
     }
     const lector = new FileReader();
-    lector.onload = () => setPreviewFoto(lector.result);
+    lector.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 400;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const factor = MAX / Math.max(width, height);
+          width = Math.round(width * factor);
+          height = Math.round(height * factor);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setPreviewFoto(dataUrl);
+      };
+      img.onerror = () => setMensajeFoto({ tipo: 'error', texto: 'No se pudo leer la imagen' });
+      img.src = lector.result;
+    };
     lector.readAsDataURL(archivo);
   };
 

@@ -418,6 +418,10 @@ export default function Sidebar() {
               <ItemLink to="/edificios" icon={Iconos.edificio}>
                 Edificios
               </ItemLink>
+
+              <ItemLink to="/usuarios" icon={Iconos.usuarios}>
+                Usuarios
+              </ItemLink>
             </>
           )}
 
