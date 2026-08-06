@@ -35,6 +35,7 @@ export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [carreras, setCarreras] = useState([]);
   const [busqueda, setBusqueda] = useState('');
+  const [filtroRol, setFiltroRol] = useState('');
   const [cargando, setCargando] = useState(true);
   const [modal, setModal] = useState({ abierto: false, editar: null });
   const [form, setForm] = useState({ nombre: '', email: '', contrasena: '', rol: 'director', id_carrera: '' });
@@ -66,14 +67,15 @@ export default function Usuarios() {
   }, []);
 
   const usuariosFiltrados = useMemo(() => {
-    if (!busqueda.trim()) return usuarios;
     const q = busqueda.trim().toLowerCase();
-    return usuarios.filter(u =>
-      (u.nombre || '').toLowerCase().includes(q) ||
-      (u.email_institucional || '').toLowerCase().includes(q) ||
-      (u.nombre_carrera || '').toLowerCase().includes(q)
-    );
-  }, [usuarios, busqueda]);
+    return usuarios.filter(u => {
+      if (filtroRol && u.rol !== filtroRol) return false;
+      if (!q) return true;
+      return (u.nombre || '').toLowerCase().includes(q) ||
+        (u.email_institucional || '').toLowerCase().includes(q) ||
+        (u.nombre_carrera || '').toLowerCase().includes(q);
+    });
+  }, [usuarios, busqueda, filtroRol]);
 
   const abrirNuevo = () => {
     setModal({ abierto: true, editar: null });
@@ -173,6 +175,16 @@ export default function Usuarios() {
             className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/20 text-sm"
           />
         </div>
+        <select
+          value={filtroRol}
+          onChange={e => setFiltroRol(e.target.value)}
+          className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+        >
+          <option value="">Todos los roles</option>
+          {ROLES_DISPONIBLES.map(r => (
+            <option key={r.valor} value={r.valor}>{r.etiqueta}</option>
+          ))}
+        </select>
         <span className="text-sm text-gray-500 self-center ml-auto">
           {usuariosFiltrados.length} usuario{usuariosFiltrados.length !== 1 ? 's' : ''}
         </span>
@@ -207,9 +219,13 @@ export default function Usuarios() {
                   <tr key={u.id_usuario} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#701330]/10 flex items-center justify-center text-[#701330] font-bold text-xs flex-shrink-0">
-                          {getInitials(u.nombre)}
-                        </div>
+                        {u.foto ? (
+                          <img src={u.foto} alt={u.nombre} className="w-9 h-9 rounded-full object-cover border border-gray-200 flex-shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-[#701330]/10 flex items-center justify-center text-[#701330] font-bold text-xs flex-shrink-0">
+                            {getInitials(u.nombre)}
+                          </div>
+                        )}
                         <span className="font-medium text-gray-800">{u.nombre}</span>
                       </div>
                     </td>
@@ -321,7 +337,7 @@ export default function Usuarios() {
                 >
                   <option value="">Sin asignar</option>
                   {carreras.map(c => (
-                    <option key={c.id_carrera} value={String(c.id_carrera)}>{c.nombre_carrera}</option>
+                    <option key={c.id} value={String(c.id)}>{c.nombre}</option>
                   ))}
                 </select>
               </div>
