@@ -335,7 +335,7 @@ export default function Header() {
             <div className="relative">
               {usuario?.foto || usuario?.foto_perfil ? (
                 <img
-                  src={usuario.foto_perfil}
+                  src={usuario.foto || usuario.foto_perfil}
                   alt={usuario.nombre}
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#701330] object-cover transition-transform duration-300 group-hover:scale-105 group-hover:shadow-md"
                 />
@@ -371,7 +371,7 @@ export default function Header() {
                 <div className="flex items-center gap-3">
                   {usuario?.foto || usuario?.foto_perfil ? (
                     <img
-                      src={usuario.foto_perfil}
+                      src={usuario.foto || usuario.foto_perfil}
                       alt={usuario.nombre}
                       className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200"
                     />
