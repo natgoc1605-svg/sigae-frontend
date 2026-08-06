@@ -14,7 +14,8 @@ export default function Perfil() {
   const [datos, setDatos] = useState({
     nombre: '',
     email: '',
-    carrera: ''
+    carrera: '',
+    id_carrera: ''
   });
   const [contrasena, setContrasena] = useState({
     actual: '',
@@ -23,7 +24,10 @@ export default function Perfil() {
   });
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
   const [mensajeFoto, setMensajeFoto] = useState({ tipo: '', texto: '' });
+  const [mensajeDatos, setMensajeDatos] = useState({ tipo: '', texto: '' });
   const [subiendoFoto, setSubiendoFoto] = useState(false);
+  const [eliminandoFoto, setEliminandoFoto] = useState(false);
+  const [guardaDatos, setGuardaDatos] = useState(false);
   const [previewFoto, setPreviewFoto] = useState(null);
   const inputFoto = useRef(null);
 
@@ -34,10 +38,60 @@ export default function Perfil() {
       setDatos({
         nombre: usuario.nombre || '',
         email: usuario.email || usuario.email_institucional || '',
-        carrera: usuario.carrera_nombre || 'Sin asignar'
+        carrera: usuario.carrera_nombre || 'Sin asignar',
+        id_carrera: usuario.id_carrera !== undefined && usuario.id_carrera !== null ? String(usuario.id_carrera) : ''
       });
     }
   }, [usuario]);
+
+  const [carreras, setCarreras] = useState([]);
+
+  useEffect(() => {
+    let activo = true;
+    api.get('/api/carreras')
+      .then(res => { if (activo) setCarreras(res.data || []); })
+      .catch(() => {});
+    return () => { activo = false; };
+  }, []);
+
+  const guardarDatos = async (e) => {
+    e.preventDefault();
+    setMensajeDatos({ tipo: '', texto: '' });
+    if (datos.nombre.trim().length < 3) {
+      setMensajeDatos({ tipo: 'error', texto: 'El nombre debe tener al menos 3 caracteres' });
+      return;
+    }
+    setGuardaDatos(true);
+    try {
+      const res = await api.put('/api/auth/perfil', {
+        nombre: datos.nombre.trim(),
+        id_carrera: datos.id_carrera ? Number(datos.id_carrera) : null
+      });
+      const u = res.data?.usuario;
+      actualizarUsuario({ nombre: datos.nombre.trim(), id_carrera: datos.id_carrera ? Number(datos.id_carrera) : null, carrera_nombre: u?.carrera_nombre || (carreras.find(c => String(c.id_carrera) === datos.id_carrera)?.nombre_carrera || null) });
+      setMensajeDatos({ tipo: 'exito', texto: 'Datos actualizados correctamente' });
+    } catch (err) {
+      setMensajeDatos({ tipo: 'error', texto: err.response?.data?.detail || 'No se pudieron guardar los datos' });
+    } finally {
+      setGuardaDatos(false);
+    }
+  };
+
+  const eliminarFoto = async () => {
+    setEliminandoFoto(true);
+    setMensajeFoto({ tipo: '', texto: '' });
+    try {
+      await api.delete('/api/auth/foto/eliminar');
+      actualizarUsuario({ foto: null, foto_perfil: null });
+      setPreviewFoto(null);
+      if (inputFoto.current) inputFoto.current.value = '';
+      setMensajeFoto({ tipo: 'exito', texto: 'Foto eliminada correctamente' });
+    } catch (err) {
+      setMensajeFoto({ tipo: 'error', texto: err.response?.data?.detail || 'No se pudo eliminar la foto' });
+    } finally {
+      setEliminandoFoto(false);
+    }
+  };
 
   const cambiarContrasena = async (e) => {
     e.preventDefault();
@@ -161,6 +215,18 @@ export default function Perfil() {
                 >
                   {previewFoto ? 'Elegir otra imagen' : foto ? 'Cambiar foto' : 'Subir foto'}
                 </button>
+                {foto && !previewFoto && (
+                  <button
+                    onClick={eliminarFoto}
+                    disabled={eliminandoFoto}
+                    className="w-full sm:w-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    {eliminandoFoto ? 'Eliminando...' : 'Eliminar foto'}
+                  </button>
+                )}
                 <input
                   ref={inputFoto}
                   type="file"
@@ -184,10 +250,22 @@ export default function Perfil() {
           {/* Datos de usuario */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 className="text-lg font-semibold mb-4">Datos de Usuario</h3>
-            <div className="space-y-3">
+            {mensajeDatos.texto && (
+              <div className={`mb-4 p-3 rounded-lg text-sm ${mensajeDatos.tipo === 'exito' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                {mensajeDatos.texto}
+              </div>
+            )}
+            <form onSubmit={guardarDatos} className="space-y-3">
               <div>
                 <label className="label">Nombre completo</label>
-                <input type="text" className="input" value={datos.nombre} readOnly />
+                <input
+                  type="text"
+                  className="input"
+                  value={datos.nombre}
+                  onChange={e => setDatos({ ...datos, nombre: e.target.value })}
+                  required
+                  disabled={guardaDatos}
+                />
               </div>
               <div>
                 <label className="label">Correo institucional</label>
@@ -195,9 +273,22 @@ export default function Perfil() {
               </div>
               <div>
                 <label className="label">Carrera</label>
-                <input type="text" className="input" value={datos.carrera} readOnly />
+                <select
+                  className="input"
+                  value={datos.id_carrera}
+                  onChange={e => setDatos({ ...datos, id_carrera: e.target.value, carrera: carreras.find(c => String(c.id_carrera) === e.target.value)?.nombre_carrera || 'Sin asignar' })}
+                  disabled={guardaDatos}
+                >
+                  <option value="">Sin asignar</option>
+                  {carreras.map(c => (
+                    <option key={c.id_carrera} value={String(c.id_carrera)}>{c.nombre_carrera}</option>
+                  ))}
+                </select>
               </div>
-            </div>
+              <button type="submit" className="btn btn-primary w-full" disabled={guardaDatos}>
+                {guardaDatos ? 'Guardando...' : 'Guardar cambios'}
+              </button>
+            </form>
           </div>
         </div>
 
