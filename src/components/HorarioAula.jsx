@@ -944,11 +944,11 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                     <span>{evento.sigla_docente || evento.nombre_docente || 'Sin docente'}</span>
                                   )}
                                 </div>
-                                {!esPendiente && evento.nombre_creador && (
+                                {!esPendiente && evento.nombre_creador && evento.rol_creador === 'director' && (
                                   <div className="flex flex-wrap items-center gap-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
                                     <span
                                       title={`${evento.nombre_creador}${etiquetaRol(evento.rol_creador)}`}
-                                      className={`px-1.5 py-0.5 rounded font-bold ${reservaDeOtroDirector ? 'bg-amber-500/90 text-white' : 'bg-black/10'}`}
+                                      className="px-1.5 py-0.5 rounded font-bold bg-amber-500/90 text-white"
                                     >
                                       {getIniciales(evento.nombre_creador)}
                                     </span>

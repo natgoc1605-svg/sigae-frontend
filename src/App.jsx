@@ -16,6 +16,7 @@ import ResponsableReservas from './pages/ResponsableReservas';
 import Reportes from './pages/Reportes';
 import Configuracion from './pages/Configuracion';
 import Usuarios from './pages/Usuarios';
+import Carreras from './pages/Carreras';
 import { ROLES } from './utils/auth';
 
 // Componente wrapper para rutas que necesitan layout
@@ -155,6 +156,15 @@ function App() {
             element={
               <RutaPorRol rolesPermitidos={[ROLES.SUPER_ADMIN]}>
                 <Usuarios />
+              </RutaPorRol>
+            } 
+          />
+
+          <Route 
+            path="/carreras" 
+            element={
+              <RutaPorRol rolesPermitidos={[ROLES.SUPER_ADMIN]}>
+                <Carreras />
               </RutaPorRol>
             } 
           />
