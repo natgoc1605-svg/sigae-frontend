@@ -162,6 +162,29 @@ function obtenerColorContraste(hexColor) {
   return esColorClaro(hexColor) ? '#2D3748' : '#FFFFFF';
 }
 
+function getIniciales(nombre) {
+  if (!nombre) return '?';
+  const partes = nombre.trim().split(/\s+/);
+  if (partes.length === 1) return partes[0].charAt(0).toUpperCase();
+  return (partes[0].charAt(0) + partes[partes.length - 1].charAt(0)).toUpperCase();
+}
+
+function bloqueHora(bloque) {
+  return bloque && bloque.hora ? bloque.hora : '—';
+}
+
+function renderDetalle(etiqueta, valor, sub = '', destacado = false) {
+  return (
+    <div className={`p-3 rounded-lg border text-sm ${destacado ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-100'}`}>
+      <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-500">{etiqueta}</p>
+      <p className="font-semibold text-gray-800 mt-0.5 leading-snug">
+        {valor}
+        {sub ? <span className="text-gray-500 font-normal"> ({sub})</span> : null}
+      </p>
+    </div>
+  );
+}
+
 function etiquetaRol(rol) {
   const mapa = {
     superadmin: 'Admin',
@@ -200,6 +223,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
   const [maxHorasSolicitud, setMaxHorasSolicitud] = useState(1);
   const [enviandoSolicitud, setEnviandoSolicitud] = useState(false);
   const [confirmar, setConfirmar] = useState(null);
+  const [eventoDetalle, setEventoDetalle] = useState(null);
 
   const [edificiosPermitidos, setEdificiosPermitidos] = useState([]);
   const [filtroGrupo, setFiltroGrupo] = useState('');
@@ -849,12 +873,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                         });
                         
                         let colores = null;
+                        let reservaDeOtroDirector = false;
                         if (evento) {
                           const nombreMat = evento.nombre_materia || evento.sigla_materia || '';
                           const siglaMat = evento.sigla_materia || '';
                           const colorGuardado = evento.color || evento.materia_color || null;
                           const creadorSuperAdmin = evento.rol_creador === 'superadmin';
-                          const reservaDeOtroDirector = esDirector && !esSuperAdmin && evento.id_usuario && evento.id_usuario !== idDirector && !creadorSuperAdmin;
+                          reservaDeOtroDirector = esDirector && !esSuperAdmin && evento.id_usuario && evento.id_usuario !== idDirector && !creadorSuperAdmin;
                           if (reservaDeOtroDirector) {
                             colores = { fondo: '#B0BEC5', borde: '#78909C', texto: '#FFFFFF' };
                           } else {
@@ -864,19 +889,24 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                         
                         const esPendiente = !!evento?.pendiente;
                         if (esPendiente) {
-                          colores = { fondo: '#FEF3C7', borde: '#F59E0B', texto: '#92400E' };
+                          const creadorSuperAdmin = evento.rol_creador === 'superadmin';
+                          colores = creadorSuperAdmin
+                            ? { fondo: '#FEF3C7', borde: '#F59E0B', texto: '#92400E' }
+                            : { fondo: '#CBD5E1', borde: '#64748B', texto: '#FFFFFF' };
                         }
                         
                         return (
-                          <td key={dia} className="border-b border-gray-100 p-1 align-top transition-all duration-200 cursor-pointer hover:bg-gray-50/50 min-h-[80px] relative">
+                          <td key={dia} className="border-b border-gray-100 p-1 align-top relative">
                             {evento ? (
                               <div 
+                                onClick={(e) => { e.stopPropagation(); setEventoDetalle({ evento, dia, bloque }); }}
+                                title="Ver detalles"
                                 style={{ 
                                   backgroundColor: colores ? colores.fondo : COLORS.primaryPale,
                                   borderLeftColor: colores ? colores.borde : COLORS.primary,
                                   borderLeftWidth: '6px'
                                 }}
-                                className="w-full h-full min-h-[70px] p-2 rounded-lg relative group transition-all duration-200 hover:shadow-md border-l-4 text-xs flex flex-col justify-between"
+                                className="w-full h-[96px] p-2 rounded-lg relative group transition-all duration-200 hover:shadow-md border-l-4 text-xs flex flex-col justify-between overflow-hidden"
                               >
                                 <div className="flex flex-wrap items-center gap-1">
                                   {esPendiente && (
@@ -914,16 +944,15 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                     <span>{evento.sigla_docente || evento.nombre_docente || 'Sin docente'}</span>
                                   )}
                                 </div>
-                                {!esPendiente && evento.nombre_creador && (
-                                  <div className="flex flex-wrap items-center gap-x-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
-                                    <span className={`px-1.5 py-0.5 rounded font-medium ${reservaDeOtroDirector ? 'bg-amber-500/90 text-white' : 'bg-black/10'}`}>
-                                      {reservaDeOtroDirector && (
-                                        <svg className="w-3 h-3 inline-block mr-0.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                      )}
-                                      Responsable: {evento.nombre_creador}{etiquetaRol(evento.rol_creador)}
+                                {!esPendiente && evento.nombre_creador && evento.rol_creador === 'director' && (
+                                  <div className="flex flex-wrap items-center gap-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
+                                    <span
+                                      title={`${evento.nombre_creador}${etiquetaRol(evento.rol_creador)}`}
+                                      className="px-1.5 py-0.5 rounded font-bold bg-amber-500/90 text-white"
+                                    >
+                                      {getIniciales(evento.nombre_creador)}
                                     </span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" title="Reserva aprobada"></span>
                                   </div>
                                 )}
                                 <div className="flex flex-wrap items-center gap-x-2 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
@@ -947,7 +976,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                               </div>
                             ) : (
                               <div 
-                                className={`w-full h-full min-h-[70px] flex items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300 cursor-pointer ${
+                                className={`w-full h-[96px] flex items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300 cursor-pointer ${
                                   permisoReal 
                                     ? 'border-gray-300 hover:border-[#701330] hover:bg-[#FDF2F6]' 
                                     : 'border-gray-200 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
@@ -1052,16 +1081,20 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-gray-600 bg-white/70 px-3 py-2 rounded-lg border border-gray-200/60">
                 <span className="font-semibold text-gray-700">Leyenda:</span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#B0BEC5', border: '1px solid #78909C' }}></span>
-                  Otra docencia (incidencia)
+                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#CBD5E1', border: '1px solid #64748B' }}></span>
+                  Espera de aprobación (director)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-amber-400"></span>
-                  En espera de aprobación
+                  Espera de aprobación (admin)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded text-white bg-amber-500 text-[9px] font-bold">⚠</span>
-                  Responsable de la reserva (celda)
+                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                  Reserva aprobada
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#B0BEC5', border: '1px solid #78909C' }}></span>
+                  Otra docencia (incidencia)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-gray-300"></span>
@@ -1362,6 +1395,64 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {eventoDetalle && (
+        <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="absolute inset-0 bg-black/55 animate-fadeIn" onClick={() => setEventoDetalle(null)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-modalIn">
+            <div className="flex items-start justify-between gap-3 p-5 border-b border-gray-100 bg-gradient-to-r from-[#FDF2F6] to-white sticky top-0 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm" style={{ backgroundColor: eventoDetalle.evento.color && eventoDetalle.evento.color !== '#701330' ? eventoDetalle.evento.color : COLORS.primaryPale, color: COLORS.primary }}>
+                  {getIniciales(eventoDetalle.evento.sigla_materia || eventoDetalle.evento.nombre_materia || '?')}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {eventoDetalle.evento.esPendiente ? 'Solicitud en espera' : (eventoDetalle.evento.sigla_materia || eventoDetalle.evento.nombre_materia || 'Asignación')}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5 capitalize">
+                    {eventoDetalle.dia} • {bloqueHora(eventoDetalle.bloque)} • {aula.nombre_aula}
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setEventoDetalle(null)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all duration-300 hover:rotate-90 flex-shrink-0">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              {eventoDetalle.evento.esPendiente ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Esta solicitud está pendiente de aprobación por el responsable del edificio.
+                </div>
+              ) : null}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {renderDetalle('Materia', eventoDetalle.evento.nombre_materia || '—', eventoDetalle.evento.sigla_materia)}
+                {renderDetalle('Profesor', eventoDetalle.evento.nombre_docente || 'Sin asignar', eventoDetalle.evento.sigla_docente)}
+                {renderDetalle('Grupo', eventoDetalle.evento.sigla_grupo)}
+                {renderDetalle('Carrera', eventoDetalle.evento.nombre_carrera || '—', eventoDetalle.evento.sigla_carrera)}
+                {renderDetalle('Aula de clase', eventoDetalle.evento.aula_clase || '—')}
+                {renderDetalle('Tutor', eventoDetalle.evento.tutor_grupo || '—')}
+                {renderDetalle('Turno', eventoDetalle.evento.turno ? String(eventoDetalle.evento.turno).charAt(0).toUpperCase() + String(eventoDetalle.evento.turno).slice(1) : '—')}
+                {!eventoDetalle.evento.esPendiente && (() => {
+                  const delEvento = eventoDetalle.evento;
+                  const esOtroDirector = esDirector && !esSuperAdmin && delEvento.id_usuario && delEvento.id_usuario !== idDirector && delEvento.rol_creador !== 'superadmin';
+                  return renderDetalle('Responsable de la reserva', delEvento.nombre_creador ? `${delEvento.nombre_creador}${etiquetaRol(delEvento.rol_creador)}` : 'Importado por Excel', delEvento.nombre_creador ? getIniciales(delEvento.nombre_creador) : '', esOtroDirector);
+                })()}
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setEventoDetalle(null)}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

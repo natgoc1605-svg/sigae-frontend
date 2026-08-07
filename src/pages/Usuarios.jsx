@@ -4,8 +4,6 @@ import ToastLocal from '../components/ToastLocal';
 
 const ROLES_DISPONIBLES = [
   { valor: 'director', etiqueta: 'Director de Carrera' },
-  { valor: 'docente', etiqueta: 'Docente' },
-  { valor: 'alumno', etiqueta: 'Alumno' },
   { valor: 'superadmin', etiqueta: 'Super Administrador' }
 ];
 
