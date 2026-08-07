@@ -32,12 +32,19 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ 
-        /* Fondo degradado profesional con profundidad */
-        background: 'radial-gradient(circle at top, #701330 0%, #581026 40%, #3f0c1d 100%)'
-      }}
-    >
+  className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+  style={{ 
+    background: `
+      radial-gradient(circle at top, rgba(112,19,48,0.5) 0%, rgba(88,16,38,0.5) 40%, rgba(63,12,29,0.9) 100%),
+      url('/logoUtvt.png')
+    `,
+    backgroundSize: 'cover, cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backdropFilter: 'blur(6px)',
+    WebkitBackdropFilter: 'blur(6px)',
+  }}
+>
       {/* Efectos de luz difusa para dar sensación de espacio */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/4 rounded-full blur-[130px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-white/3 rounded-full blur-[110px] pointer-events-none"></div>
@@ -48,10 +55,8 @@ export default function Login() {
           animar ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
-        <div className="bg-white rounded-[24px] shadow-[0_30px_70px_rgba(0,0,0,0.35)] p-9 relative overflow-hidden">
-          
-          {/* Reflejo superior sutil */}
-          <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-white/60 to-transparent pointer-events-none"></div>
+        
+        <div className="bg-white/50 backdrop-blur-lg rounded-[24px] shadow-[0_30px_70px_rgba(0,0,0,0.35)] p-9 relative overflow-hidden border border-white/5">
 
           {/* Logos: IGUAL A TU DISEÑO */}
           <div className="flex items-center justify-center gap-5 mb-8 relative z-10">
@@ -60,7 +65,7 @@ export default function Login() {
               alt="Gobierno del Estado de México" 
               className="h-12 w-auto object-contain"
             />
-            <div className="w-[1px] h-14 bg-gray-200"></div>
+            <div className="w-[1px] h-14 bg-black-200"></div>
             <img 
               src="https://i.ytimg.com/vi/y0_7Q1fpbHc/maxresdefault.jpg"
               alt="UTVT" 
@@ -71,10 +76,10 @@ export default function Login() {
           {/* Título y descripción */}
           <div className="text-center mb-8 relative z-10">
             <h1 className="text-[36px] font-extrabold text-[#701330] tracking-wide">SIGAE</h1>
-            <p className="text-gray-600 mt-3 text-[15px] font-normal">
+            <p className="text-black-600 mt-3 text-[15px] font-normal">
               Sistema Integral de Gestión y Administración de Espacios
             </p>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-black-500 text-sm mt-1">
               Universidad Tecnológica del Valle de Toluca
             </p>
             <div className="w-44 h-[1.5px] bg-[#701330] mx-auto mt-5 rounded-full"></div>
@@ -90,7 +95,7 @@ export default function Login() {
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
             <div className="group">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 transition-colors duration-200 group-focus-within:text-[#701330]">
+              <label htmlFor="email" className="block text-sm font-medium text-black-700 mb-2 transition-colors duration-200 group-focus-within:text-[#701330]">
                 Correo Institucional
               </label>
               <input
@@ -106,7 +111,7 @@ export default function Login() {
             </div>
 
             <div className="group">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2 transition-colors duration-200 group-focus-within:text-[#701330]">
+              <label htmlFor="password" className="block text-sm font-medium text-black-700 mb-2 transition-colors duration-200 group-focus-within:text-[#701330]">
                 Contraseña
               </label>
               <input
@@ -156,7 +161,7 @@ export default function Login() {
           </form>
 
           {/* Pie de página */}
-          <div className="mt-9 text-center text-sm text-gray-500 relative z-10">
+          <div className="mt-9 text-center text-sm text-black-500 relative z-10">
             <p>© {new Date().getFullYear()} Universidad Tecnológica del Valle de Toluca</p>
             <p className="mt-1 font-medium text-[#701330]">Gobierno del Estado de México</p>
           </div>

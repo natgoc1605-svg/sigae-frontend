@@ -114,7 +114,7 @@ export default function Dashboard() {
           e.porcentajeOcupacion >= 80 ? '#dc2626' :
           e.porcentajeOcupacion >= 50 ? '#f59e0b' : '#16a34a'
         ),
-        borderRadius: 6,
+        borderRadius: 8,
         borderWidth: 0,
         barPercentage: 0.7,
       },
@@ -152,7 +152,7 @@ export default function Dashboard() {
         labels: {
           usePointStyle: true,
           padding: 20,
-          font: { size: 12 }
+          font: { size: 12, family: "'Inter', system-ui, sans-serif" }
         }
       },
       tooltip: {
@@ -162,6 +162,7 @@ export default function Dashboard() {
         borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 12,
+        cornerRadius: 8,
         callbacks: {
           label: function(context) {
             const edificio = ocupacionPorEdificio[context.dataIndex];
@@ -183,12 +184,12 @@ export default function Dashboard() {
       y: {
         beginAtZero: true,
         max: 100,
-        ticks: { callback: v => `${v}%`, stepSize: 20 },
-        grid: { color: 'rgba(0,0,0,0.06)' }
+        ticks: { callback: v => `${v}%`, stepSize: 20, font: { size: 11 } },
+        grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false }
       },
       x: {
         grid: { display: false },
-        ticks: { font: { size: 11, weight: 'bold' } }
+        ticks: { font: { size: 11, weight: '500' } }
       }
     },
     animation: { duration: 1000, easing: 'easeOutQuart' }
@@ -202,7 +203,8 @@ export default function Dashboard() {
       backgroundColor: ['#16a34a', '#f59e0b', '#dc2626'],
       borderWidth: 3,
       borderColor: '#ffffff',
-      cutout: '72%'
+      cutout: '72%',
+      hoverOffset: 8
     }]
   };
 
@@ -215,7 +217,7 @@ export default function Dashboard() {
         labels: {
           usePointStyle: true,
           padding: 20,
-          font: { size: 12, weight: 'bold' }
+          font: { size: 12, weight: '500', family: "'Inter', system-ui, sans-serif" }
         }
       },
       tooltip: {
@@ -225,6 +227,7 @@ export default function Dashboard() {
         borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 12,
+        cornerRadius: 8,
         callbacks: {
           label: function(context) {
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -244,253 +247,309 @@ export default function Dashboard() {
 
   if (cargando) {
     return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#701330] border-t-transparent"></div>
+      <div className="flex items-center justify-center h-[80vh] bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-14 w-14 border-4 border-[#701330] border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-gray-500 font-medium">Cargando panel de control...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      <div className={`transition-all duration-700 ease-out ${animar ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
-        <h1 className="text-2xl md:text-3xl font-bold text-[#701330]">SIGAE - Panel de Control</h1>
-        <p className="text-gray-600 mt-1">Información en tiempo real • Última actualización: {new Date().toLocaleTimeString('es-MX')}</p>
-      </div>
-
-      {/* Tarjetas de métricas con navegación a filtros */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 my-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => irAInfraestructura(null)}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-[#701330]/10 rounded-xl">
-              <svg className="w-6 h-6 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100/50">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className={`transition-all duration-700 ease-out ${animar ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#701330] tracking-tight">
+                SIGAE - Panel de Control
+              </h1>
+              <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Información en tiempo real • Última actualización: {new Date().toLocaleTimeString('es-MX')}
+              </p>
+            </div>
+            <button
+              onClick={cargarDatos}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#701330] bg-white rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-[#701330]/30 transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Total espacios</span>
-          </div>
-          <p className="text-3xl font-bold text-gray-800">{estadisticas.totalEspacios}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-[#701330] rounded-full" style={{ width: '100%' }} />
-            </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">{edificios.length} edificios</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => irAInfraestructura('Libre')}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-100 rounded-xl">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-green-500">Disponibles</span>
-          </div>
-          <p className="text-3xl font-bold text-green-600">{estadisticas.disponibles}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-green-500 rounded-full" style={{ width: `${estadisticas.totalEspacios > 0 ? Math.round((estadisticas.disponibles / estadisticas.totalEspacios) * 100) : 0}%` }} />
-            </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">{estadisticas.totalEspacios > 0 ? `${Math.round((estadisticas.disponibles / estadisticas.totalEspacios) * 100)}%` : '0%'}</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => irAInfraestructura('Parcial')}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-amber-100 rounded-xl">
-              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Uso Parcial</span>
-          </div>
-          <p className="text-3xl font-bold text-amber-600">{estadisticas.usoParcial}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-amber-500 rounded-full" style={{ width: `${estadisticas.totalEspacios > 0 ? Math.round((estadisticas.usoParcial / estadisticas.totalEspacios) * 100) : 0}%` }} />
-            </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">{estadisticas.totalEspacios > 0 ? `${Math.round((estadisticas.usoParcial / estadisticas.totalEspacios) * 100)}%` : '0%'}</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => irAInfraestructura('Ocupado')}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-red-100 rounded-xl">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-red-500">Ocupados</span>
-          </div>
-          <p className="text-3xl font-bold text-red-600">{estadisticas.ocupados}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-red-500 rounded-full" style={{ width: `${estadisticas.totalEspacios > 0 ? Math.round((estadisticas.ocupados / estadisticas.totalEspacios) * 100) : 0}%` }} />
-            </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">{estadisticas.totalEspacios > 0 ? `${Math.round((estadisticas.ocupados / estadisticas.totalEspacios) * 100)}%` : '0%'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4">Porcentaje de Ocupación por Edificio</h3>
-          <div className="h-72">
-            {ocupacionPorEdificio.length > 0 ? (
-              <Bar data={datosBarrasPorcentaje} options={opcionesBarrasPorcentaje} />
-            ) : (
-              <p className="text-gray-500 text-center py-16">Sin datos de edificios</p>
-            )}
-          </div>
-          <div className="flex justify-center gap-6 mt-4 text-sm text-gray-600">
-            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-green-500"></span> Bajo (&lt;50%)</span>
-            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500"></span> Medio (50-79%)</span>
-            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Alto (≥80%)</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4">Distribución Global</h3>
-          <div className="h-52 flex items-center justify-center">
-            {estadisticas.totalEspacios > 0 ? (
-              <Doughnut data={datosCircular} options={opcionesCircular} />
-            ) : (
-              <p className="text-gray-500">Sin datos disponibles</p>
-            )}
-          </div>
-          <div className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-green-500"></span> Disponibles</span>
-              <span className="font-semibold">{estadisticas.disponibles} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.disponibles / estadisticas.totalEspacios) * 100) : 0}%)</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500"></span> Uso Parcial</span>
-              <span className="font-semibold">{estadisticas.usoParcial} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.usoParcial / estadisticas.totalEspacios) * 100) : 0}%)</span>
-            </div>
-            <div className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Ocupados</span>
-              <span className="font-semibold">{estadisticas.ocupados} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.ocupados / estadisticas.totalEspacios) * 100) : 0}%)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Listas de espacios con apertura directa de horario */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Espacios con Alta Demanda ({altaDemanda.length})
-          </h3>
-          <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
-            {altaDemanda.length > 0 ? altaDemanda.map(a => (
-              <div
-                key={a.id_aula}
-                className="space-y-1 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200"
-                onClick={() => irAInfraestructura(null, a)}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-sm">{a.nombre_aula}</span>
-                  <span className="text-red-600 font-bold text-sm">{a.porcentaje_ocupacion || 0}%</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{edificios.find(e => e.id_edificio === a.id_edificio)?.nombre_edificio || '-'}</span>
-                  <span>{a.capacidad || 0} lugares • Planta {a.planta}</span>
-                </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{width: `${a.porcentaje_ocupacion || 0}%`}} />
-                </div>
-              </div>
-            )) : <p className="text-gray-500 text-center py-8">No hay espacios en alta demanda</p>}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-green-600 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Espacios Disponibles ({espaciosLibres.length})
-          </h3>
-          <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
-            {espaciosLibres.length > 0 ? espaciosLibres.map(a => (
-              <div
-                key={a.id_aula}
-                className="space-y-1 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200"
-                onClick={() => irAInfraestructura(null, a)}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-sm">{a.nombre_aula}</span>
-                  <span className="text-green-600 font-bold text-sm">0%</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{edificios.find(e => e.id_edificio === a.id_edificio)?.nombre_edificio || '-'}</span>
-                  <span>{a.capacidad || 0} lugares • Planta {a.planta}</span>
-                </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full transition-all duration-500" style={{width: '0%'}} />
-                </div>
-              </div>
-            )) : <p className="text-gray-500 text-center py-8">No hay espacios disponibles</p>}
-          </div>
-        </div>
-      </div>
-
-      {/* Módulos del Sistema */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
-        <h3 className="text-lg font-semibold mb-4">Módulos del Sistema</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <button onClick={() => navigate('/infraestructura')} className="p-4 bg-gray-50 hover:bg-[#701330]/5 rounded-lg border border-gray-200 text-left transition-all hover:shadow-md">
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
-              </svg>
-              <p className="font-medium text-sm">Infraestructura</p>
-            </div>
-            <p className="text-xs text-gray-500">Edificios y aulas</p>
-          </button>
-          <button onClick={() => navigate('/solicitudes')} className="p-4 bg-gray-50 hover:bg-[#701330]/5 rounded-lg border border-gray-200 text-left transition-all hover:shadow-md">
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              <p className="font-medium text-sm">Solicitudes</p>
-            </div>
-            <p className="text-xs text-gray-500">Gestionar solicitudes</p>
-          </button>
-          <button onClick={() => navigate('/horarios')} className="p-4 bg-gray-50 hover:bg-[#701330]/5 rounded-lg border border-gray-200 text-left transition-all hover:shadow-md">
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p className="font-medium text-sm">Horarios</p>
-            </div>
-            <p className="text-xs text-gray-500">Ver y editar</p>
-          </button>
-          <button onClick={() => navigate('/reportes')} className="p-4 bg-gray-50 hover:bg-[#701330]/5 rounded-lg border border-gray-200 text-left transition-all hover:shadow-md">
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <p className="font-medium text-sm">Reportes</p>
-            </div>
-            <p className="text-xs text-gray-500">Estadísticas</p>
-          </button>
-          {esSuperAdmin && (
-            <button onClick={() => navigate('/configuracion')} className="p-4 bg-gray-50 hover:bg-[#701330]/5 rounded-lg border border-gray-200 text-left transition-all hover:shadow-md">
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <p className="font-medium text-sm">Configuración</p>
-              </div>
-              <p className="text-xs text-gray-500">Usuarios y ajustes</p>
+              Actualizar
             </button>
-          )}
+          </div>
+
+          {/* Tarjetas de métricas con navegación a filtros */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 lg:gap-6 mb-6">
+            {[
+              { label: 'Total espacios', value: estadisticas.totalEspacios, color: '[#701330]', icon: 'building', onClick: () => irAInfraestructura(null), bg: 'bg-[#701330]/10' },
+              { label: 'Disponibles', value: estadisticas.disponibles, color: 'green', icon: 'check', onClick: () => irAInfraestructura('Libre'), bg: 'bg-green-100' },
+              { label: 'Uso Parcial', value: estadisticas.usoParcial, color: 'amber', icon: 'clock', onClick: () => irAInfraestructura('Parcial'), bg: 'bg-amber-100' },
+              { label: 'Ocupados', value: estadisticas.ocupados, color: 'red', icon: 'x', onClick: () => irAInfraestructura('Ocupado'), bg: 'bg-red-100' }
+            ].map((item, index) => {
+              const porcentaje = estadisticas.totalEspacios > 0 ? Math.round((item.value / estadisticas.totalEspacios) * 100) : 0;
+              const colorMap = {
+                green: 'text-green-600',
+                amber: 'text-amber-600',
+                red: 'text-red-600',
+                '[#701330]': 'text-[#701330]'
+              };
+              const bgMap = {
+                green: 'bg-green-500',
+                amber: 'bg-amber-500',
+                red: 'bg-red-500',
+                '[#701330]': 'bg-[#701330]'
+              };
+              const iconMap = {
+                building: (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+                ),
+                check: (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                ),
+                clock: (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                ),
+                x: (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                )
+              };
+              return (
+                <div
+                  key={index}
+                  onClick={item.onClick}
+                  className="group bg-white rounded-2xl shadow-sm border border-gray-100/80 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`p-3 rounded-xl ${item.bg} group-hover:scale-110 transition-transform duration-300`}>
+                      <svg className={`w-5 h-5 ${colorMap[item.color]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {iconMap[item.icon]}
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                      {item.label}
+                    </span>
+                  </div>
+                  <p className={`text-3xl font-bold ${colorMap[item.color]}`}>
+                    {item.value}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${bgMap[item.color]} rounded-full transition-all duration-700 ease-out`} 
+                        style={{ width: `${porcentaje}%` }} 
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500 min-w-[40px] text-right">
+                      {porcentaje}%
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Gráficos */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
+            <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Porcentaje de Ocupación por Edificio</h3>
+                <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">Promedio</span>
+              </div>
+              <div className="h-64 sm:h-72">
+                {ocupacionPorEdificio.length > 0 ? (
+                  <Bar data={datosBarrasPorcentaje} options={opcionesBarrasPorcentaje} />
+                ) : (
+                  <p className="text-gray-500 text-center py-16">Sin datos de edificios</p>
+                )}
+              </div>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-5 text-xs sm:text-sm text-gray-600">
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-green-500"></span> Bajo (&lt;50%)</span>
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500"></span> Medio (50-79%)</span>
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Alto (≥80%)</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Distribución Global</h3>
+              <div className="h-48 sm:h-52 flex items-center justify-center">
+                {estadisticas.totalEspacios > 0 ? (
+                  <Doughnut data={datosCircular} options={opcionesCircular} />
+                ) : (
+                  <p className="text-gray-500">Sin datos disponibles</p>
+                )}
+              </div>
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="flex justify-between items-center p-2.5 bg-gray-50/80 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                  <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-green-500"></span> Disponibles</span>
+                  <span className="font-semibold text-gray-800">{estadisticas.disponibles} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.disponibles / estadisticas.totalEspacios) * 100) : 0}%)</span>
+                </div>
+                <div className="flex justify-between items-center p-2.5 bg-gray-50/80 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                  <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500"></span> Uso Parcial</span>
+                  <span className="font-semibold text-gray-800">{estadisticas.usoParcial} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.usoParcial / estadisticas.totalEspacios) * 100) : 0}%)</span>
+                </div>
+                <div className="flex justify-between items-center p-2.5 bg-gray-50/80 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                  <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500"></span> Ocupados</span>
+                  <span className="font-semibold text-gray-800">{estadisticas.ocupados} ({estadisticas.totalEspacios > 0 ? Math.round((estadisticas.ocupados / estadisticas.totalEspacios) * 100) : 0}%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Listas de espacios con apertura directa de horario */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-red-600 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Espacios con Alta Demanda
+                </h3>
+                <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {altaDemanda.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                {altaDemanda.length > 0 ? altaDemanda.map(a => (
+                  <div
+                    key={a.id_aula}
+                    className="group p-3.5 bg-gray-50/50 hover:bg-white rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-md"
+                    onClick={() => irAInfraestructura(null, a)}
+                  >
+                    <div className="flex justify-between items-start mb-1.5">
+                      <span className="font-medium text-sm text-gray-800 group-hover:text-[#701330] transition-colors">
+                        {a.nombre_aula}
+                      </span>
+                      <span className="text-red-600 font-bold text-sm bg-red-50 px-2 py-0.5 rounded-lg">
+                        {a.porcentaje_ocupacion || 0}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>{edificios.find(e => e.id_edificio === a.id_edificio)?.nombre_edificio || '-'}</span>
+                      <span>{a.capacidad || 0} lugares • Planta {a.planta}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mt-2">
+                      <div 
+                        className="h-full bg-red-500 rounded-full transition-all duration-700 ease-out" 
+                        style={{width: `${a.porcentaje_ocupacion || 0}%`}} 
+                      />
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-12">
+                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-gray-500">No hay espacios en alta demanda</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-green-600 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Espacios Disponibles
+                </h3>
+                <span className="bg-green-100 text-green-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {espaciosLibres.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                {espaciosLibres.length > 0 ? espaciosLibres.map(a => (
+                  <div
+                    key={a.id_aula}
+                    className="group p-3.5 bg-gray-50/50 hover:bg-white rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-md"
+                    onClick={() => irAInfraestructura(null, a)}
+                  >
+                    <div className="flex justify-between items-start mb-1.5">
+                      <span className="font-medium text-sm text-gray-800 group-hover:text-[#701330] transition-colors">
+                        {a.nombre_aula}
+                      </span>
+                      <span className="text-green-600 font-bold text-sm bg-green-50 px-2 py-0.5 rounded-lg">
+                        0%
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>{edificios.find(e => e.id_edificio === a.id_edificio)?.nombre_edificio || '-'}</span>
+                      <span>{a.capacidad || 0} lugares • Planta {a.planta}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mt-2">
+                      <div className="h-full bg-green-500 rounded-full transition-all duration-700 ease-out" style={{width: '0%'}} />
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-12">
+                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <p className="text-gray-500">No hay espacios disponibles</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Módulos del Sistema */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 sm:p-6 mt-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Módulos del Sistema</h3>
+              <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">Navegación rápida</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+              {[
+                { path: '/infraestructura', label: 'Infraestructura', desc: 'Edificios y aulas', icon: 'building' },
+                { path: '/solicitudes', label: 'Solicitudes', desc: 'Gestionar solicitudes', icon: 'file' },
+                { path: '/horarios', label: 'Horarios', desc: 'Ver y editar', icon: 'calendar' },
+                { path: '/reportes', label: 'Reportes', desc: 'Estadísticas', icon: 'chart' },
+                ...(esSuperAdmin ? [{ path: '/configuracion', label: 'Configuración', desc: 'Usuarios y ajustes', icon: 'settings' }] : [])
+              ].map((modulo) => {
+                const iconMap = {
+                  building: (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+                  ),
+                  file: (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  ),
+                  calendar: (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  ),
+                  chart: (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  ),
+                  settings: (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  )
+                };
+                return (
+                  <button
+                    key={modulo.path}
+                    onClick={() => navigate(modulo.path)}
+                    className="group p-4 bg-gray-50/80 hover:bg-white rounded-xl border border-gray-100 hover:border-[#701330]/20 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="p-2 bg-white rounded-lg group-hover:bg-[#701330]/5 transition-colors duration-300">
+                        <svg className="w-5 h-5 text-gray-600 group-hover:text-[#701330] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          {iconMap[modulo.icon]}
+                        </svg>
+                      </div>
+                      <p className="font-medium text-sm text-gray-700 group-hover:text-[#701330] transition-colors duration-300">
+                        {modulo.label}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-400 pl-1">{modulo.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>

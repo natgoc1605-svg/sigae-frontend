@@ -169,151 +169,365 @@ export default function Perfil() {
   };
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-bold text-[#701330] mb-6">Mi Perfil</h2>
-
-      <div className="grid md:grid-cols-2 gap-6 max-w-5xl">
-        <div className="space-y-6">
-          {/* Foto de perfil */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold mb-4">Foto de Perfil</h3>
-            <div className="flex flex-col sm:flex-row items-center gap-5">
-              <div className="relative">
-                {foto || previewFoto ? (
-                  <img
-                    src={previewFoto || foto}
-                    alt={usuario?.nombre}
-                    className="w-28 h-28 rounded-full object-cover border-4 border-[#701330]/20 shadow-md"
-                  />
-                ) : (
-                  <div className="w-28 h-28 rounded-full bg-[#701330] flex items-center justify-center text-white font-bold text-3xl border-4 border-[#701330]/20 shadow-md">
-                    {getInitials(usuario?.nombre)}
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 w-full">
-                {previewFoto && (
-                  <div className="mb-3 flex gap-2">
-                    <button
-                      onClick={guardarFoto}
-                      disabled={subiendoFoto}
-                      className="flex-1 px-4 py-2 bg-[#701330] hover:bg-[#912347] text-white rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
-                    >
-                      {subiendoFoto ? 'Guardando...' : 'Guardar foto'}
-                    </button>
-                    <button
-                      onClick={() => { setPreviewFoto(null); inputFoto.current.value = ''; }}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                )}
-                <button
-                  onClick={() => inputFoto.current?.click()}
-                  className="w-full sm:w-auto px-4 py-2 border-2 border-dashed border-gray-300 hover:border-[#701330] hover:text-[#701330] rounded-lg text-gray-600 transition-colors text-sm"
-                >
-                  {previewFoto ? 'Elegir otra imagen' : foto ? 'Cambiar foto' : 'Subir foto'}
-                </button>
-                {foto && !previewFoto && (
-                  <button
-                    onClick={eliminarFoto}
-                    disabled={eliminandoFoto}
-                    className="w-full sm:w-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    {eliminandoFoto ? 'Eliminando...' : 'Eliminar foto'}
-                  </button>
-                )}
-                <input
-                  ref={inputFoto}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={seleccionarFoto}
-                />
-                <p className="text-xs text-gray-400 mt-2">JPG o PNG, máximo 2MB</p>
-                {mensajeFoto.texto && (
-                  <p className={`mt-2 text-sm ${mensajeFoto.tipo === 'exito' ? 'text-green-600' : 'text-red-600'}`}>
-                    {mensajeFoto.texto}
-                  </p>
-                )}
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-4">
-              Tu foto se mostrará en el encabezado, en tus solicitudes y notificaciones.
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/80">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2.5 bg-[#701330]/10 rounded-xl">
+            <svg className="w-6 h-6 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
-
-          {/* Datos de usuario */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold mb-4">Datos de Usuario</h3>
-            {mensajeDatos.texto && (
-              <div className={`mb-4 p-3 rounded-lg text-sm ${mensajeDatos.tipo === 'exito' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                {mensajeDatos.texto}
-              </div>
-            )}
-            <form onSubmit={guardarDatos} className="space-y-3">
-              <div>
-                <label className="label">Nombre completo</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={datos.nombre}
-                  onChange={e => setDatos({ ...datos, nombre: e.target.value })}
-                  required
-                  disabled={guardaDatos}
-                />
-              </div>
-              <div>
-                <label className="label">Correo institucional</label>
-                <input type="email" className="input" value={datos.email} readOnly />
-              </div>
-              <div>
-                <label className="label">Carrera</label>
-                <select
-                  className="input"
-                  value={datos.id_carrera}
-                  onChange={e => setDatos({ ...datos, id_carrera: e.target.value, carrera: carreras.find(c => String(c.id_carrera) === e.target.value)?.nombre_carrera || 'Sin asignar' })}
-                  disabled={guardaDatos}
-                >
-                  <option value="">Sin asignar</option>
-                  {carreras.map(c => (
-                    <option key={c.id_carrera} value={String(c.id_carrera)}>{c.nombre_carrera}</option>
-                  ))}
-                </select>
-              </div>
-              <button type="submit" className="btn btn-primary w-full" disabled={guardaDatos}>
-                {guardaDatos ? 'Guardando...' : 'Guardar cambios'}
-              </button>
-            </form>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Mi Perfil</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Gestiona tu información personal y seguridad</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
-          <h3 className="text-lg font-semibold mb-4">Cambiar Contraseña</h3>
-          {mensaje.texto && (
-            <div className={`mb-4 p-3 rounded-lg text-sm ${mensaje.tipo === 'exito' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-              {mensaje.texto}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Columna izquierda - Foto y datos */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Foto de perfil */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-7 bg-[#701330] rounded-full"></div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Foto de Perfil</h3>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="relative group">
+                  {foto || previewFoto ? (
+                    <img
+                      src={previewFoto || foto}
+                      alt={usuario?.nombre}
+                      className="w-32 h-32 rounded-full object-cover border-4 border-[#701330]/20 shadow-lg group-hover:shadow-xl transition-all duration-300"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#701330] to-[#912347] flex items-center justify-center text-white font-bold text-4xl border-4 border-[#701330]/20 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      {getInitials(usuario?.nombre)}
+                    </div>
+                  )}
+                  {previewFoto && (
+                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-5 h-5 rounded-full border-2 border-white"></div>
+                  )}
+                </div>
+
+                <div className="flex-1 w-full space-y-3">
+                  {previewFoto && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={guardarFoto}
+                        disabled={subiendoFoto}
+                        className="flex-1 px-4 py-2.5 bg-[#701330] hover:bg-[#912347] text-white rounded-xl font-medium transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
+                      >
+                        {subiendoFoto ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Guardar foto
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => { setPreviewFoto(null); if (inputFoto.current) inputFoto.current.value = ''; }}
+                        className="px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 text-sm"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => inputFoto.current?.click()}
+                      className="flex-1 min-w-[120px] px-4 py-2.5 border-2 border-dashed border-gray-300 hover:border-[#701330] hover:text-[#701330] rounded-xl text-gray-600 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {previewFoto ? 'Elegir otra imagen' : foto ? 'Cambiar foto' : 'Subir foto'}
+                    </button>
+                    {foto && !previewFoto && (
+                      <button
+                        onClick={eliminarFoto}
+                        disabled={eliminandoFoto}
+                        className="px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 text-sm font-medium flex items-center gap-1.5 disabled:opacity-50"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        {eliminandoFoto ? 'Eliminando...' : 'Eliminar'}
+                      </button>
+                    )}
+                  </div>
+
+                  <input
+                    ref={inputFoto}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={seleccionarFoto}
+                  />
+
+                  <p className="text-xs text-gray-400 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    JPG o PNG, máximo 2MB
+                  </p>
+
+                  {mensajeFoto.texto && (
+                    <div className={`p-3 rounded-xl text-sm flex items-center gap-2 ${
+                      mensajeFoto.tipo === 'exito' 
+                        ? 'bg-green-50 text-green-700 border border-green-200' 
+                        : 'bg-red-50 text-red-700 border border-red-200'
+                    }`}>
+                      {mensajeFoto.tipo === 'exito' ? (
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                      {mensajeFoto.texto}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-xs text-gray-400 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Tu foto se mostrará en el encabezado, en tus solicitudes y notificaciones.
+                </p>
+              </div>
             </div>
-          )}
-          <form onSubmit={cambiarContrasena} className="space-y-3">
-            <div>
-              <label className="label">Contraseña actual</label>
-              <input type="password" className="input" value={contrasena.actual} onChange={e => setContrasena({...contrasena, actual: e.target.value})} required />
+
+            {/* Datos de usuario */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-7 bg-[#701330] rounded-full"></div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Datos de Usuario</h3>
+              </div>
+
+              {mensajeDatos.texto && (
+                <div className={`mb-4 p-3 rounded-xl text-sm flex items-center gap-2 ${
+                  mensajeDatos.tipo === 'exito' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {mensajeDatos.tipo === 'exito' ? (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {mensajeDatos.texto}
+                </div>
+              )}
+
+              <form onSubmit={guardarDatos} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Nombre completo <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all"
+                    value={datos.nombre}
+                    onChange={e => setDatos({ ...datos, nombre: e.target.value })}
+                    required
+                    disabled={guardaDatos}
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Correo institucional
+                  </label>
+                  <div className="relative">
+                    <input 
+                      type="email" 
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed"
+                      value={datos.email} 
+                      readOnly 
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    El correo no se puede modificar
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Carrera
+                  </label>
+                  <select
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all bg-white"
+                    value={datos.id_carrera}
+                    onChange={e => setDatos({ ...datos, id_carrera: e.target.value, carrera: carreras.find(c => String(c.id_carrera) === e.target.value)?.nombre_carrera || 'Sin asignar' })}
+                    disabled={guardaDatos}
+                  >
+                    <option value="">Sin asignar</option>
+                    {carreras.map(c => (
+                      <option key={c.id_carrera} value={String(c.id_carrera)}>{c.nombre_carrera}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="w-full px-4 py-2.5 bg-[#701330] hover:bg-[#912347] text-white rounded-xl font-medium transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  disabled={guardaDatos}
+                >
+                  {guardaDatos ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Guardar cambios
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
-            <div>
-              <label className="label">Nueva contraseña</label>
-              <input type="password" className="input" value={contrasena.nueva} onChange={e => setContrasena({...contrasena, nueva: e.target.value})} required />
+          </div>
+
+          {/* Columna derecha - Cambiar contraseña */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 sticky top-6 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-7 bg-[#701330] rounded-full"></div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Cambiar Contraseña</h3>
+              </div>
+
+              {mensaje.texto && (
+                <div className={`mb-4 p-3 rounded-xl text-sm flex items-center gap-2 ${
+                  mensaje.tipo === 'exito' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {mensaje.tipo === 'exito' ? (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {mensaje.texto}
+                </div>
+              )}
+
+              <form onSubmit={cambiarContrasena} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Contraseña actual <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input 
+                      type="password" 
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all" 
+                      value={contrasena.actual} 
+                      onChange={e => setContrasena({...contrasena, actual: e.target.value})} 
+                      required 
+                      placeholder="••••••••"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Nueva contraseña <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="password" 
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all" 
+                    value={contrasena.nueva} 
+                    onChange={e => setContrasena({...contrasena, nueva: e.target.value})} 
+                    required 
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Confirmar nueva contraseña <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="password" 
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all" 
+                    value={contrasena.confirmar} 
+                    onChange={e => setContrasena({...contrasena, confirmar: e.target.value})} 
+                    required 
+                    placeholder="Repite la contraseña"
+                  />
+                </div>
+
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-xs text-amber-700">
+                    La contraseña debe tener al menos 6 caracteres
+                  </p>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="w-full px-4 py-2.5 bg-[#701330] hover:bg-[#912347] text-white rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  Actualizar contraseña
+                </button>
+              </form>
+
+              {/* Información de seguridad */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Recomendamos cambiar la contraseña cada 90 días</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="label">Confirmar nueva contraseña</label>
-              <input type="password" className="input" value={contrasena.confirmar} onChange={e => setContrasena({...contrasena, confirmar: e.target.value})} required />
-            </div>
-            <button type="submit" className="btn btn-primary w-full mt-2">Actualizar contraseña</button>
-          </form>
+          </div>
         </div>
       </div>
     </div>
