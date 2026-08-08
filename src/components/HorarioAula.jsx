@@ -892,7 +892,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                           const creadorSuperAdmin = evento.rol_creador === 'superadmin';
                           colores = creadorSuperAdmin
                             ? { fondo: '#FEF3C7', borde: '#F59E0B', texto: '#92400E' }
-                            : { fondo: '#CBD5E1', borde: '#64748B', texto: '#FFFFFF' };
+                            : { fondo: '#CBD5E1', borde: '#64748B', texto: '#1F2937' };
                         }
                         
                         return (

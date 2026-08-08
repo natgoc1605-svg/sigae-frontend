@@ -405,7 +405,7 @@ function RevisarSolicitud({ solicitud, cerrar, onActualizada }) {
   const formatearFecha = (fecha) => {
     if (!fecha) return 'No especificada';
     try {
-      return new Date(fecha).toLocaleDateString('es-MX', {
+      return new Date((fecha || '') + 'T12:00:00').toLocaleDateString('es-MX', {
         day: '2-digit',
         month: 'long',
         year: 'numeric'
@@ -434,7 +434,7 @@ function RevisarSolicitud({ solicitud, cerrar, onActualizada }) {
       'Domingo': 'Domingo'
     };
     try {
-      const fechaObj = new Date(fecha);
+      const fechaObj = new Date((fecha || '') + 'T12:00:00');
       const diaIngles = fechaObj.toLocaleDateString('en-US', { weekday: 'long' });
       return dias[diaIngles] || fechaObj.toLocaleDateString('es-MX', { weekday: 'long' });
     } catch {
@@ -535,9 +535,14 @@ function RevisarSolicitud({ solicitud, cerrar, onActualizada }) {
           <div>
             <p className="text-gray-500 text-xs">Estado</p>
             <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-              solicitud.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-              solicitud.estado === 'Aprobada' ? 'bg-green-100 text-green-800' :
-              'bg-red-100 text-red-800'
+              solicitud.estado === 'Pendiente' ? (
+                solicitud.solicitante_rol === 'superadmin'
+                  ? 'bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]'
+                  : 'bg-[#CBD5E1] text-[#1F2937] border border-[#64748B]'
+              ) :
+              solicitud.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border border-green-200' :
+              solicitud.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border border-red-200' :
+              'bg-yellow-100 text-yellow-800'
             }`}>
               {solicitud.estado || 'Pendiente'}
             </span>

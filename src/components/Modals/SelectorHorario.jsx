@@ -17,7 +17,7 @@ function SelectorHorario({ solicitud, onSeleccionar, onCerrar }) {
       setCargando(true);
       setMensaje(null);
       
-      const fechaOriginal = new Date(solicitud.fecha_solicitud);
+      const fechaOriginal = new Date((solicitud.fecha_solicitud || '') + 'T12:00:00');
       const fechaInicio = new Date(fechaOriginal);
       fechaInicio.setDate(fechaInicio.getDate() - 7);
       const fechaFin = new Date(fechaOriginal);
@@ -57,7 +57,7 @@ function SelectorHorario({ solicitud, onSeleccionar, onCerrar }) {
 
   const confirmarSeleccion = () => {
     if (fechaSeleccionada && bloqueSeleccionado) {
-      const fechaObj = new Date(fechaSeleccionada.fecha);
+      const fechaObj = new Date((fechaSeleccionada.fecha || '') + 'T12:00:00');
       const fechaStr = fechaObj.toLocaleDateString('es-MX', {
         day: '2-digit',
         month: 'long',
@@ -187,7 +187,7 @@ function SelectorHorario({ solicitud, onSeleccionar, onCerrar }) {
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Mejor opción: <span className="font-semibold">{mejorDia.dia_semana}, {new Date(mejorDia.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}</span> con {mejorDia.conteo} bloques disponibles
+            Mejor opción: <span className="font-semibold">{mejorDia.dia_semana}, {new Date((mejorDia.fecha || '') + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}</span> con {mejorDia.conteo} bloques disponibles
           </div>
         )}
 
@@ -229,7 +229,7 @@ function SelectorHorario({ solicitud, onSeleccionar, onCerrar }) {
                       <td className="px-4 py-3 border border-gray-200 text-sm font-medium">
                         <div className="font-semibold text-gray-800">{dia.dia_semana}</div>
                         <div className="text-xs text-gray-500">
-                          {new Date(dia.fecha).toLocaleDateString('es-MX', {
+                          {new Date((dia.fecha || '') + 'T12:00:00').toLocaleDateString('es-MX', {
                             day: '2-digit',
                             month: 'short',
                             year: 'numeric'
@@ -311,7 +311,7 @@ function SelectorHorario({ solicitud, onSeleccionar, onCerrar }) {
                     <span className="text-gray-600">Fecha:</span>
                     <span className="font-medium text-gray-800 ml-2">
                       {fechaSeleccionada.dia_semana}, {
-                        new Date(fechaSeleccionada.fecha).toLocaleDateString('es-MX', {
+                        new Date((fechaSeleccionada.fecha || '') + 'T12:00:00').toLocaleDateString('es-MX', {
                           day: '2-digit',
                           month: 'long',
                           year: 'numeric'

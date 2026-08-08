@@ -157,6 +157,9 @@ export default function Solicitudes() {
             const estado = ESTADOS[sol.estado] || ESTADOS.Pendiente;
             const esPendiente = sol.estado === 'Pendiente';
             const puedeRevisar = usuario?.rol === 'superadmin' && esPendiente;
+            const clasePendiente = sol.solicitante_rol === 'superadmin'
+              ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]'
+              : 'bg-[#CBD5E1] text-[#1F2937] border-[#64748B]';
 
             return (
               <div
@@ -181,7 +184,7 @@ export default function Solicitudes() {
                     <span className="font-mono font-bold text-gray-800 text-sm bg-gray-100 px-3 py-1 rounded-md">
                       {sol.codigo_solicitud}
                     </span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${estado.clase}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${esPendiente ? clasePendiente : estado.clase}`}>
                       {estado.texto}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -214,7 +217,7 @@ export default function Solicitudes() {
                   <div>
                     <span className="text-gray-500 text-xs">Fecha solicitada</span>
                     <p className="font-medium text-gray-800">
-                      {new Date(sol.fecha_solicitud).toLocaleDateString('es-MX', {
+                      {new Date((sol.fecha_solicitud || '') + 'T12:00:00').toLocaleDateString('es-MX', {
                         day: '2-digit',
                         month: 'long',
                         year: 'numeric'
