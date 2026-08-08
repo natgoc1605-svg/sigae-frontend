@@ -345,7 +345,7 @@ export default function Infraestructura() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/80">
-      <header className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-10 backdrop-blur-sm bg-white/95">
+      <header className="bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-5">
           <nav className="text-xs sm:text-sm text-gray-500 mb-3">
             <span className="text-[#701330] font-medium">SIGAE</span>
