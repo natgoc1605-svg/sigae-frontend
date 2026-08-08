@@ -340,7 +340,11 @@ export default function ResponsableReservas() {
                     
                     <div className="flex items-center gap-3 flex-wrap flex-shrink-0">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                        sol.estado === 'Pendiente' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                        sol.estado === 'Pendiente' ? (
+                          sol.solicitante_rol === 'superadmin'
+                            ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]'
+                            : 'bg-[#CBD5E1] text-[#1F2937] border-[#64748B]'
+                        ) :
                         sol.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border-green-200' :
                         sol.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border-red-200' :
                         'bg-gray-100 text-gray-800 border-gray-200'

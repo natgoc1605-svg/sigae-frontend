@@ -721,7 +721,9 @@ export default function DirectorReservas() {
                           <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
                             sol.estado === 'Aprobada' ? 'bg-green-100 text-green-700' :
                             sol.estado === 'Rechazada' ? 'bg-red-100 text-red-700' :
-                            'bg-blue-100 text-blue-700'
+                            sol.solicitante_rol === 'superadmin'
+                              ? 'bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]'
+                              : 'bg-[#CBD5E1] text-[#1F2937] border border-[#64748B]'
                           }`}>
                             {sol.estado}
                           </span>
