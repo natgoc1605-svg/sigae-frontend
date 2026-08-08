@@ -204,7 +204,7 @@ export default function Header() {
       <div className="hidden lg:flex items-center gap-4">
         <div className="relative group">
           <img 
-            src="/logoUtvt.png" 
+            src="/cuervo.jpg" 
             alt="Logo UTVT" 
             className="h-12 w-auto transition-all duration-300 group-hover:scale-105 drop-shadow-sm" 
             onError={(e) => { e.target.style.display = 'none'; }}

@@ -59,18 +59,18 @@ export default function Login() {
         <div className="bg-white/50 backdrop-blur-lg rounded-[24px] shadow-[0_30px_70px_rgba(0,0,0,0.35)] p-9 relative overflow-hidden border border-white/5">
 
           {/* Logos: IGUAL A TU DISEÑO */}
-          <div className="flex items-center justify-center gap-5 mb-8 relative z-10">
-            <img 
-              src="logoUtvt.png"
-              alt="Gobierno del Estado de México" 
-              className="h-12 w-auto object-contain"
-            />
-            <div className="w-[1px] h-14 bg-black-200"></div>
-            <img 
-              src="https://i.ytimg.com/vi/y0_7Q1fpbHc/maxresdefault.jpg"
-              alt="UTVT" 
-              className="h-16 w-auto rounded-md shadow-sm object-cover"
-            />
+          <div className="flex flex-col items-center gap-6 mb-8 relative z-10">
+            <div className="w-24 h-24 rounded-full bg-[#B32338]/10 flex items-center justify-center p-2 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <img 
+                src="cuervo.jpg" 
+                alt="Gobierno del Estado de México" 
+                className="w-full h-full object-contain rounded-full"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="%23B32338" stroke-width="2"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/%3E%3C/svg%3E';
+                }}
+              />
+            </div>
           </div>
 
           {/* Título y descripción */}

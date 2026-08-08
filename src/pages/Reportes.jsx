@@ -61,9 +61,9 @@ export default function Reportes() {
   };
 
   const estadoIcon = (estado) => {
-    if (estado === 'Ocupado') return '🔴';
-    if (estado === 'Parcial') return '🟡';
-    return '🟢';
+    if (estado === 'Ocupado') return '';
+    if (estado === 'Parcial') return '';
+    return '';
   };
 
   return (

@@ -502,9 +502,19 @@ export default function DirectorReservas() {
 
   if (!usuario) {
     return (
-      <div className="p-4 md:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg max-w-md">
-          <p className="text-yellow-700">No has iniciado sesión. Por favor, inicia sesión para continuar.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-amber-100 p-8 max-w-md w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-amber-100 rounded-full">
+              <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">No has iniciado sesión</h2>
+              <p className="text-sm text-gray-600 mt-0.5">Por favor, inicia sesión para continuar</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -512,10 +522,22 @@ export default function DirectorReservas() {
 
   if (!isDirector(usuario) && !isSuperAdmin(usuario)) {
     return (
-      <div className="p-4 md:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg max-w-md">
-          <p className="text-red-700">No tienes permisos para acceder a esta página.</p>
-          <p className="text-sm text-gray-600 mt-2">Tu rol actual es: {usuario.rol}</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-red-100 p-8 max-w-md w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-red-100 rounded-full">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Acceso Restringido</h2>
+              <p className="text-sm text-gray-600 mt-0.5">No tienes permisos para acceder</p>
+            </div>
+          </div>
+          <p className="text-sm text-red-700 bg-red-50 p-3 rounded-lg">
+            Tu rol actual es: <strong className="text-red-800">{usuario.rol}</strong>
+          </p>
         </div>
       </div>
     );
@@ -523,17 +545,27 @@ export default function DirectorReservas() {
 
   if (idDirector === null || idDirector === undefined) {
     return (
-      <div className="p-4 md:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg max-w-md">
-          <p className="text-red-700">Error de autenticación</p>
-          <p className="text-sm text-gray-600 mt-2">No se pudo identificar al director. Por favor, cierra sesión y vuelve a iniciar.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-red-100 p-8 max-w-md w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-red-100 rounded-full">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Error de Autenticación</h2>
+              <p className="text-sm text-gray-600 mt-0.5">No se pudo identificar al director</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">Por favor, cierra sesión y vuelve a iniciar.</p>
           <button 
             onClick={() => {
               localStorage.removeItem('user');
               localStorage.removeItem('token');
               window.location.reload();
             }}
-            className="mt-3 px-4 py-2 bg-[#701330] text-white rounded-lg hover:bg-[#912347]"
+            className="w-full px-4 py-2.5 bg-[#701330] hover:bg-[#912347] text-white rounded-xl font-medium transition-all duration-300 hover:shadow-lg"
           >
             Cerrar sesión y recargar
           </button>
@@ -544,637 +576,718 @@ export default function DirectorReservas() {
 
   if (cargando) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#701330] border-t-transparent"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-14 h-14 border-4 border-[#701330]/20 border-t-[#701330] rounded-full animate-spin"></div>
+          <p className="mt-4 text-gray-500 font-medium">Cargando horario...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      {alerta.mostrar && (
-        <div className={`fixed top-6 right-6 z-[100] max-w-md w-full rounded-xl shadow-lg p-4 flex items-center gap-3 animate-fadeIn ${
-          alerta.tipo === 'exito' ? 'bg-green-50 border-l-4 border-green-600 text-green-900' :
-          alerta.tipo === 'error' ? 'bg-red-50 border-l-4 border-red-600 text-red-900' :
-          'bg-blue-50 border-l-4 border-blue-600 text-blue-900'
-        }`}>
-          <span className="text-sm font-medium">{alerta.mensaje}</span>
-        </div>
-      )}
-
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#701330]">Solicitar Reserva de Espacio</h1>
-        <p className="text-gray-500 mt-1">Puedes solicitar reservas en cualquier edificio del campus</p>
-      </div>
-
-      <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            <h2 className="font-semibold text-gray-800">Mis Solicitudes</h2>
-            <span className="text-xs bg-[#701330]/10 text-[#701330] px-2 py-0.5 rounded-full font-medium">
-              {misSolicitudes.length}
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/80">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Alerta flotante */}
+        {alerta.mostrar && (
+          <div className={`fixed top-4 right-4 z-[100] max-w-md w-full rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-fadeIn ${
+            alerta.tipo === 'exito' ? 'bg-green-50 border-2 border-green-200 text-green-800' :
+            alerta.tipo === 'error' ? 'bg-red-50 border-2 border-red-200 text-red-800' :
+            'bg-blue-50 border-2 border-blue-200 text-blue-800'
+          }`}>
+            <div className={`p-1.5 rounded-full flex-shrink-0 ${
+              alerta.tipo === 'exito' ? 'bg-green-200' : 
+              alerta.tipo === 'error' ? 'bg-red-200' : 'bg-blue-200'
+            }`}>
+              {alerta.tipo === 'exito' ? (
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : alerta.tipo === 'error' ? (
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+            </div>
+            <span className="text-sm font-medium flex-1">{alerta.mensaje}</span>
+            <button 
+              onClick={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })}
+              className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <button
-            onClick={cargarMisSolicitudes}
-            className="text-xs text-gray-500 hover:text-[#701330] flex items-center gap-1"
-            title="Actualizar"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Actualizar
-          </button>
+        )}
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-[#701330]/10 rounded-xl">
+                <svg className="w-6 h-6 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  Solicitar Reserva de Espacio
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  Puedes solicitar reservas en cualquier edificio del campus
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
-          {cargandoSolicitudes && misSolicitudes.length === 0 ? (
-            <div className="p-6 text-center">
-              <div className="inline-block w-6 h-6 border-2 border-[#701330] border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm text-gray-500 mt-2">Cargando solicitudes...</p>
+
+        {/* Mis Solicitudes */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6 hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <h2 className="font-semibold text-gray-800">Mis Solicitudes</h2>
+              <span className="text-xs bg-[#701330]/10 text-[#701330] px-2.5 py-0.5 rounded-full font-medium">
+                {misSolicitudes.length}
+              </span>
             </div>
-          ) : misSolicitudes.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="text-sm text-gray-500">Aún no has enviado solicitudes de reserva</p>
-            </div>
-          ) : (
-            misSolicitudes.map((sol) => {
-              const propuestaPendiente = sol.propuesta_estado === 'enviada';
-              const propuestaBloque = BLOQUES.find(b => b.id === sol.propuesta_id_bloque);
-              return (
-                <div
-                  key={sol.id_solicitud}
-                  className={`px-4 py-3 transition-colors ${
-                    resaltarSolicitud === sol.id_solicitud
-                      ? 'bg-[#701330]/10 ring-2 ring-inset ring-[#701330]/40'
-                      : propuestaPendiente
-                      ? 'bg-amber-50/60'
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-sm text-gray-900">{sol.codigo_solicitud}</span>
-                        <span className="text-xs text-gray-500">{sol.aula_nombre}</span>
-                        {sol.edificio_nombre && (
-                          <span className="text-xs text-gray-400">• {sol.edificio_nombre}</span>
+            <button
+              onClick={cargarMisSolicitudes}
+              className="text-xs text-gray-500 hover:text-[#701330] flex items-center gap-1.5 transition-colors duration-200 hover:scale-105"
+              title="Actualizar"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Actualizar
+            </button>
+          </div>
+          <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
+            {cargandoSolicitudes && misSolicitudes.length === 0 ? (
+              <div className="p-8 text-center">
+                <div className="inline-block w-6 h-6 border-2 border-[#701330] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm text-gray-500 mt-2">Cargando solicitudes...</p>
+              </div>
+            ) : misSolicitudes.length === 0 ? (
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-gray-500">Aún no has enviado solicitudes de reserva</p>
+              </div>
+            ) : (
+              misSolicitudes.map((sol) => {
+                const propuestaPendiente = sol.propuesta_estado === 'enviada';
+                const propuestaBloque = BLOQUES.find(b => b.id === sol.propuesta_id_bloque);
+                return (
+                  <div
+                    key={sol.id_solicitud}
+                    className={`px-4 sm:px-6 py-3 transition-all duration-300 ${
+                      resaltarSolicitud === sol.id_solicitud
+                        ? 'bg-[#701330]/10 ring-2 ring-inset ring-[#701330]/40'
+                        : propuestaPendiente
+                        ? 'bg-amber-50/60 hover:bg-amber-50/80'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm text-gray-900">{sol.codigo_solicitud}</span>
+                          <span className="text-xs text-gray-500">{sol.aula_nombre}</span>
+                          {sol.edificio_nombre && (
+                            <span className="text-xs text-gray-400">• {sol.edificio_nombre}</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-0.5">
+                          {sol.dia_semana_mostrar || ''}
+                          {sol.fecha_solicitud ? ` • ${new Date(sol.fecha_solicitud + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}` : ''}
+                          {sol.hora_inicio_str && sol.hora_fin_str ? ` • ${sol.hora_inicio_str} - ${sol.hora_fin_str} hrs` : ''}
+                        </div>
+                        {sol.motivo && (
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{sol.motivo}</p>
                         )}
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
+                            sol.estado === 'Aprobada' ? 'bg-green-100 text-green-700' :
+                            sol.estado === 'Rechazada' ? 'bg-red-100 text-red-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {sol.estado}
+                          </span>
+                          {sol.propuesta_estado === 'enviada' && (
+                            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                              Propuesta enviada
+                            </span>
+                          )}
+                          {sol.propuesta_estado === 'aceptada' && (
+                            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-green-100 text-green-700">
+                              Propuesta aceptada
+                            </span>
+                          )}
+                          {sol.propuesta_estado === 'rechazada' && (
+                            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-red-100 text-red-700">
+                              Propuesta rechazada
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-600 mt-0.5">
-                        {sol.dia_semana_mostrar || ''}
-                        {sol.fecha_solicitud ? ` • ${new Date(sol.fecha_solicitud + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}` : ''}
-                        {sol.hora_inicio_str && sol.hora_fin_str ? ` • ${sol.hora_inicio_str} - ${sol.hora_fin_str} hrs` : ''}
-                      </div>
-                      {sol.motivo && (
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{sol.motivo}</p>
+                      {propuestaPendiente && (
+                        <div className="flex flex-row sm:flex-col gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => responderPropuesta(sol, true)}
+                            disabled={respondiendo === sol.id_solicitud}
+                            className="px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-all duration-200 disabled:opacity-50 flex items-center gap-1.5 hover:scale-105"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Aceptar
+                          </button>
+                          <button
+                            onClick={() => responderPropuesta(sol, false)}
+                            disabled={respondiendo === sol.id_solicitud}
+                            className="px-4 py-1.5 rounded-xl text-xs font-semibold text-red-700 bg-red-100 hover:bg-red-200 transition-all duration-200 disabled:opacity-50 hover:scale-105"
+                          >
+                            Rechazar
+                          </button>
+                        </div>
                       )}
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                          sol.estado === 'Aprobada' ? 'bg-green-100 text-green-700' :
-                          sol.estado === 'Rechazada' ? 'bg-red-100 text-red-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {sol.estado}
-                        </span>
-                        {sol.propuesta_estado === 'enviada' && (
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-                            Propuesta enviada
-                          </span>
-                        )}
-                        {sol.propuesta_estado === 'aceptada' && (
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                            Propuesta aceptada
-                          </span>
-                        )}
-                        {sol.propuesta_estado === 'rechazada' && (
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-                            Propuesta rechazada
-                          </span>
-                        )}
-                      </div>
                     </div>
                     {propuestaPendiente && (
-                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => responderPropuesta(sol, true)}
-                          disabled={respondiendo === sol.id_solicitud}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-1"
-                        >
+                      <div className="mt-2 bg-amber-100/70 border border-amber-200 rounded-xl px-4 py-2.5 text-xs">
+                        <p className="font-semibold text-amber-800 flex items-center gap-1.5">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          Aceptar
-                        </button>
-                        <button
-                          onClick={() => responderPropuesta(sol, false)}
-                          disabled={respondiendo === sol.id_solicitud}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 bg-red-100 hover:bg-red-200 transition-colors disabled:opacity-50"
-                        >
-                          Rechazar
-                        </button>
+                          El responsable te propone otro horario:
+                        </p>
+                        <p className="text-amber-900 mt-0.5">
+                          {sol.propuesta_fecha ? `${new Date(sol.propuesta_fecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}` : ''}
+                          {propuestaBloque ? ` • Bloque ${propuestaBloque.id} (${propuestaBloque.hora})` : ''}
+                        </p>
+                        {sol.propuesta_observaciones && (
+                          <p className="text-amber-700 mt-0.5 italic">"{sol.propuesta_observaciones}"</p>
+                        )}
                       </div>
                     )}
                   </div>
-                  {propuestaPendiente && (
-                    <div className="mt-2 bg-amber-100/70 border border-amber-200 rounded-lg px-3 py-2 text-xs">
-                      <p className="font-semibold text-amber-800 flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Selección y Horario */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar - Edificios y Aulas */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 hover:shadow-md transition-shadow duration-300">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+                </svg>
+                Edificio
+              </label>
+              <select
+                value={edificioSeleccionado}
+                onChange={handleEdificioChange}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all bg-white text-sm"
+                disabled={edificios.length === 0}
+              >
+                <option value="">{edificios.length === 0 ? 'No hay edificios' : 'Seleccionar edificio'}</option>
+                {edificios.map((e) => (
+                  <option key={e.id_edificio} value={e.id_edificio}>{e.nombre_edificio}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 hover:shadow-md transition-shadow duration-300">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3" />
+                </svg>
+                Aulas
+                <span className="text-xs text-gray-400 font-normal ml-auto">{aulas.length}</span>
+              </label>
+              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                {aulas.length === 0 ? (
+                  <p className="text-gray-500 text-sm text-center py-4">
+                    {cargando ? 'Cargando...' : 'No hay aulas en este edificio'}
+                  </p>
+                ) : (
+                  aulas.map((aula) => (
+                    <button
+                      key={aula.id_aula}
+                      onClick={() => handleAulaSelect(aula)}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-3 ${
+                        aulaSeleccionada?.id_aula === aula.id_aula
+                          ? 'bg-[#701330] text-white shadow-md hover:shadow-lg'
+                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
+                        aulaSeleccionada?.id_aula === aula.id_aula
+                          ? 'bg-white/20 text-white'
+                          : 'bg-[#701330]/10 text-[#701330]'
+                      }`}>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3m6 4h.01M14 12h.01" />
                         </svg>
-                        El responsable te propone otro horario:
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{aula.nombre_aula}</div>
+                        <div className={`text-[11px] truncate ${
+                          aulaSeleccionada?.id_aula === aula.id_aula ? 'text-white/80' : 'text-gray-500'
+                        }`}>
+                          Planta {aula.planta} • Cap: {aula.capacidad} • {aula.estado}
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Horario */}
+          <div className="lg:col-span-3">
+            {aulaSeleccionada ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="mb-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">{aulaSeleccionada.nombre_aula}</h2>
+                      <p className="text-sm text-gray-500">
+                        {aulaSeleccionada.nombre_edificio} • Planta {aulaSeleccionada.planta} • {aulaSeleccionada.capacidad} lugares
                       </p>
-                      <p className="text-amber-900 mt-0.5">
-                        {sol.propuesta_fecha ? `${new Date(sol.propuesta_fecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}` : ''}
-                        {propuestaBloque ? ` • Bloque ${propuestaBloque.id} (${propuestaBloque.hora})` : ''}
-                      </p>
-                      {sol.propuesta_observaciones && (
-                        <p className="text-amber-700 mt-0.5 italic">"{sol.propuesta_observaciones}"</p>
-                      )}
                     </div>
+                    <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full">
+                      Haz clic en celda verde para reservar
+                    </span>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse min-w-[700px]">
+                    <thead>
+                      <tr>
+                        <th className="border-b-2 border-gray-200 bg-gray-50/80 p-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-28 sticky left-0 z-10">
+                          Hora
+                        </th>
+                        {DIAS.map((dia) => (
+                          <th key={dia} className="border-b-2 border-gray-200 bg-gray-50/80 p-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider capitalize min-w-[90px]">
+                            {dia.slice(0, 3)}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {BLOQUES.map((bloque) => (
+                        <tr key={bloque.inicio} className="hover:bg-gray-50/50 transition-colors duration-150">
+                          <td className="border-b border-gray-100 p-2 text-xs font-medium text-gray-700 whitespace-nowrap sticky left-0 bg-white z-10">
+                            {bloque.hora}
+                          </td>
+                          {DIAS.map((dia) => {
+                            const evento = horario.find((e) => {
+                              const diaCoincide = normalizarTexto(e.dia_semana || e.dia) === normalizarTexto(dia);
+                              const horaCoincide = normalizarHora(e.hora_inicio) === normalizarHora(bloque.inicio);
+                              return diaCoincide && horaCoincide;
+                            });
+                            
+                            let colores = null;
+                            if (evento) {
+                              colores = obtenerColorMateria(evento);
+                            }
+                            
+                            return (
+                              <td
+                                key={dia}
+                                className="border-b border-gray-100 p-1 align-top h-16 relative cursor-pointer hover:bg-gray-50/30 transition-all duration-150"
+                                onClick={() => {
+                                  if (!evento) {
+                                    setModalReserva({
+                                      abierto: true,
+                                      dia: dia,
+                                      bloque: bloque
+                                    });
+                                    setCantidadHoras(1);
+                                    setHoraFinSeleccionada(null);
+                                    setFechaSeleccionada(calcularProximaFecha(dia));
+                                  }
+                                }}
+                              >
+                                {evento ? (
+                                  <div
+                                    style={{ 
+                                      backgroundColor: evento.pendiente ? '#FEF3C7' : (colores?.fondo || '#9CA3AF'),
+                                      borderLeftColor: evento.pendiente ? '#F59E0B' : (colores?.borde || '#6B7280'),
+                                      borderLeftWidth: '6px',
+                                      color: evento.pendiente ? '#92400E' : (colores?.texto || '#1A202C')
+                                    }}
+                                    className="w-full h-full p-2 rounded-xl border-l-4 text-xs flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200"
+                                  >
+                                    {evento.pendiente ? (
+                                      <>
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-[8px] font-bold uppercase bg-white/60 px-1.5 py-0.5 rounded-full">⏳ En espera</span>
+                                        </div>
+                                        <p className="font-semibold text-xs line-clamp-2">
+                                          {evento.codigo_solicitud || 'Solicitud en espera'}
+                                        </p>
+                                        <div className="text-[10px] opacity-80">
+                                          {evento.sigla_grupo && evento.sigla_grupo !== '---' ? evento.sigla_grupo : 'Pendiente'}
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p className="font-semibold text-xs line-clamp-2">
+                                          {evento.nombre_materia || 'Reservado'}
+                                        </p>
+                                        <div className="text-[10px] opacity-80">
+                                          {evento.nombre_docente || 'Sin docente'}
+                                        </div>
+                                        <div className="text-[9px] opacity-70">
+                                          {evento.sigla_grupo || ''}
+                                        </div>
+                                      </>
+                                    )}
+                                    {evento.color === '#FCD34D' && (
+                                      <div className="text-[8px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full inline-block mt-0.5">
+                                        Super Admin
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center rounded-xl border-2 border-dashed border-green-300 hover:border-green-600 hover:bg-green-50 transition-all duration-300 bg-green-100/30 group">
+                                    <span className="text-green-600 text-xs font-medium group-hover:scale-105 transition-transform duration-200">
+                                      Disponible
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 text-xs text-gray-500 text-center bg-gray-50 py-2.5 rounded-xl border border-gray-100">
+                  Las solicitudes serán revisadas por el responsable del edificio
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 sm:p-16 text-center">
+                <div className="w-24 h-24 mx-auto mb-4 bg-[#701330]/10 rounded-2xl flex items-center justify-center">
+                  <svg className="w-12 h-12 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3m6 4h.01M14 12h.01" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">Selecciona un aula</h3>
+                <p className="text-gray-500 max-w-sm mx-auto">
+                  Elige un edificio y un aula para ver su horario y solicitar reservas
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Modal de Reserva */}
+        {modalReserva.abierto && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fadeIn">
+            <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
+              <div className="p-5 border-b border-gray-100 sticky top-0 bg-white z-10 rounded-t-2xl">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-[#701330]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900">Solicitar Reserva</h3>
+                    <p className="text-sm text-gray-500 mt-0.5 capitalize">
+                      {modalReserva.dia} • {modalReserva.bloque?.hora} • {aulaSeleccionada?.nombre_aula}
+                    </p>
+                    {fechaSeleccionada && (
+                      <p className="text-xs text-blue-600 mt-1 font-medium">
+                        {new Date(fechaSeleccionada + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    )}
+                    {horaFinSeleccionada && cantidadHoras > 1 && (
+                      <p className="text-xs text-blue-600 mt-0.5">
+                        Hasta: {horaFinSeleccionada.hora} ({cantidadHoras} horas)
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      <span className="font-medium">Disponible:</span> {maxHorasDisponibles} hora(s) consecutivas
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setModalReserva({ abierto: false, dia: null, bloque: null });
+                      setCantidadHoras(1);
+                      setHoraFinSeleccionada(null);
+                      setMaxHorasDisponibles(1);
+                      setFechaSeleccionada('');
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all duration-300 hover:rotate-90"
+                    disabled={enviando}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-5">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duración de la reserva
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3].map((horas) => (
+                      <button
+                        key={horas}
+                        type="button"
+                        onClick={() => {
+                          if (maxHorasDisponibles >= horas) {
+                            setCantidadHoras(horas);
+                          } else {
+                            mostrarAlerta('error', `No hay suficientes bloques disponibles para ${horas} horas consecutivas`);
+                          }
+                        }}
+                        className={`flex-1 py-2.5 px-3 rounded-xl font-medium transition-all duration-200 ${
+                          cantidadHoras === horas
+                            ? 'bg-[#701330] text-white shadow-md'
+                            : maxHorasDisponibles >= horas
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                        disabled={enviando || maxHorasDisponibles < horas}
+                        title={maxHorasDisponibles < horas ? 'No hay suficientes bloques disponibles' : ''}
+                      >
+                        {horas} Hora{horas > 1 ? 's' : ''}
+                        {maxHorasDisponibles < horas && (
+                          <span className="text-[8px] block text-gray-400">No disponible</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {horaFinSeleccionada && cantidadHoras > 1 && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      <span className="font-medium">Rango:</span> {modalReserva.bloque?.hora} - {horaFinSeleccionada.hora}
+                    </p>
                   )}
                 </div>
-              );
-            })
-          )}
-        </div>
-      </div>
 
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    solicitarReserva(
+                      modalReserva.dia,
+                      modalReserva.bloque,
+                      formData.get('motivo'),
+                      formData.get('grupo'),
+                      formData.get('tutor'),
+                      cantidadHoras
+                    );
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Fecha de la reserva <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={fechaSeleccionada}
+                      onChange={(e) => setFechaSeleccionada(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all"
+                      required
+                      disabled={enviando}
+                    />
+                  </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Edificio</label>
-            <select
-              value={edificioSeleccionado}
-              onChange={handleEdificioChange}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-              disabled={edificios.length === 0}
-            >
-              <option value="">{edificios.length === 0 ? 'No hay edificios' : 'Seleccionar edificio'}</option>
-              {edificios.map((e) => (
-                <option key={e.id_edificio} value={e.id_edificio}>{e.nombre_edificio}</option>
-              ))}
-            </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Motivo de la reserva
+                    </label>
+                    <textarea
+                      name="motivo"
+                      rows={3}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all resize-none"
+                      placeholder="Describe el motivo de la reserva..."
+                      disabled={enviando}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Grupo <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="grupo"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all"
+                      placeholder="Ej. DSM 31"
+                      required
+                      disabled={enviando}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Tutor <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="tutor"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all"
+                      placeholder="Nombre del tutor"
+                      required
+                      disabled={enviando}
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalReserva({ abierto: false, dia: null, bloque: null });
+                        setCantidadHoras(1);
+                        setHoraFinSeleccionada(null);
+                        setMaxHorasDisponibles(1);
+                        setFechaSeleccionada('');
+                      }}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      disabled={enviando}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={enviando}
+                      className="flex-1 px-4 py-2.5 rounded-xl font-medium text-white bg-[#701330] hover:bg-[#912347] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {enviando ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Enviando...
+                        </>
+                      ) : (
+                        `Solicitar ${cantidadHoras} Hora${cantidadHoras > 1 ? 's' : ''}`
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
+        )}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Aula</label>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {aulas.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-4">
-                  {cargando ? 'Cargando...' : 'No hay aulas en este edificio'}
-                </p>
-              ) : (
-                aulas.map((aula) => (
+        {/* Modal de Rechazo de Propuesta */}
+        {modalRechazoPropuesta && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fadeIn">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setModalRechazoPropuesta(null)}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-scaleIn">
+              <div className="p-5 border-b border-gray-100 sticky top-0 bg-white z-10 rounded-t-2xl">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900">Rechazar propuesta</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      La propuesta de horario será rechazada y el responsable será notificado.
+                    </p>
+                  </div>
                   <button
-                    key={aula.id_aula}
-                    onClick={() => handleAulaSelect(aula)}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-3 ${
-                      aulaSeleccionada?.id_aula === aula.id_aula
-                        ? 'bg-[#701330] text-white shadow-md'
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
-                    }`}
+                    onClick={() => setModalRechazoPropuesta(null)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors"
+                    disabled={respondiendo}
                   >
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      aulaSeleccionada?.id_aula === aula.id_aula
-                        ? 'bg-white/20 text-white'
-                        : 'bg-[#701330]/10 text-[#701330]'
-                    }`}>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3m6 4h.01M14 12h.01" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">{aula.nombre_aula}</div>
-                      <div className={`text-[11px] truncate ${aulaSeleccionada?.id_aula === aula.id_aula ? 'text-white/80' : 'text-gray-500'}`}>
-                        Planta {aula.planta} • Capacidad: {aula.capacidad} • {aula.estado}
-                      </div>
-                    </div>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-3">
-          {aulaSeleccionada ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-gray-800">{aulaSeleccionada.nombre_aula}</h2>
-                <p className="text-sm text-gray-500">
-                  {aulaSeleccionada.nombre_edificio} • Planta {aulaSeleccionada.planta} • {aulaSeleccionada.capacidad} lugares
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Haz clic en una celda vacía (verde) para solicitar reserva
-                </p>
+                </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse min-w-[600px]">
-                  <thead>
-                    <tr>
-                      <th className="border-b border-gray-200 bg-gray-50 p-3 text-left text-sm font-semibold text-gray-700 w-32">HORA</th>
-                      {DIAS.map((dia) => (
-                        <th key={dia} className="border-b border-gray-200 bg-gray-50 p-3 text-center text-sm font-semibold text-gray-700 capitalize">
-                          {dia}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {BLOQUES.map((bloque) => (
-                      <tr key={bloque.inicio} className="hover:bg-gray-50/70 transition-colors duration-200">
-                        <td className="border-b border-gray-100 p-3 text-sm font-medium text-gray-700 whitespace-nowrap">
-                          {bloque.hora}
-                        </td>
-                        {DIAS.map((dia) => {
-                          const evento = horario.find((e) => {
-                            const diaCoincide = normalizarTexto(e.dia_semana || e.dia) === normalizarTexto(dia);
-                            const horaCoincide = normalizarHora(e.hora_inicio) === normalizarHora(bloque.inicio);
-                            return diaCoincide && horaCoincide;
-                          });
-                          
-                          let colores = null;
-                          if (evento) {
-                            colores = obtenerColorMateria(evento);
-                          }
-                          
-                          return (
-                            <td
-                              key={dia}
-                              className="border-b border-gray-100 p-1.5 align-top h-16 relative cursor-pointer hover:bg-gray-50/50 transition-colors"
-                              onClick={() => {
-                                if (!evento) {
-                                  setModalReserva({
-                                    abierto: true,
-                                    dia: dia,
-                                    bloque: bloque
-                                  });
-                                  setCantidadHoras(1);
-                                  setHoraFinSeleccionada(null);
-                                  setFechaSeleccionada(calcularProximaFecha(dia));
-                                }
-                              }}
-                            >
-                              {evento ? (
-                                <div
-                                  style={{ 
-                                    backgroundColor: evento.pendiente ? '#FEF3C7' : (colores?.fondo || '#9CA3AF'),
-                                    borderLeftColor: evento.pendiente ? '#F59E0B' : (colores?.borde || '#6B7280'),
-                                    borderLeftWidth: '6px',
-                                    color: evento.pendiente ? '#92400E' : (colores?.texto || '#1A202C')
-                                  }}
-                                  className="w-full h-full p-2 rounded-lg border-l-4 text-xs flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200"
-                                >
-                                  {evento.pendiente ? (
-                                    <>
-                                      <div className="flex items-center gap-1">
-                                        <span className="text-[8px] font-bold uppercase bg-white/40 px-1.5 py-0.5 rounded-full">En espera</span>
-                                      </div>
-                                      <p className="font-semibold text-xs line-clamp-2">
-                                        {evento.codigo_solicitud || 'Solicitud en espera'}
-                                      </p>
-                                      <div className="text-[10px] opacity-80">
-                                        {evento.sigla_grupo && evento.sigla_grupo !== '---' ? evento.sigla_grupo : 'Pendiente de aprobación'}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <p className="font-semibold text-xs line-clamp-2">
-                                        {evento.nombre_materia || 'Reservado'}
-                                      </p>
-                                      <div className="text-[10px] opacity-80">
-                                        {evento.nombre_docente || 'Sin docente'}
-                                      </div>
-                                      <div className="text-[9px] opacity-70">
-                                        {evento.sigla_grupo || ''}
-                                      </div>
-                                    </>
-                                  )}
-                                  {evento.color === '#FCD34D' && (
-                                    <div className="text-[8px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full inline-block mt-0.5">
-                                      Super Admin
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center rounded-lg border-2 border-dashed border-green-300 hover:border-green-600 hover:bg-green-50 transition-all duration-300 bg-green-100/30">
-                                  <span className="text-green-600 text-xs font-medium">Disponible</span>
-                                </div>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="mt-4 text-xs text-gray-500 text-center bg-gray-50 py-2 rounded-lg">
-                Las solicitudes serán revisadas por el responsable del edificio
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-[#701330]/10 rounded-2xl flex items-center justify-center">
-                <svg
-                  className="w-10 h-10 text-[#701330]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3m6 4h.01M14 12h.01"
+              <div className="p-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Motivo del rechazo (opcional)
+                  </label>
+                  <textarea
+                    value={modalRechazoPropuesta.observaciones || ''}
+                    onChange={(e) => setModalRechazoPropuesta({ ...modalRechazoPropuesta, observaciones: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all resize-none"
+                    placeholder="Describe el motivo del rechazo..."
+                    disabled={respondiendo}
                   />
-                </svg>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setModalRechazoPropuesta(null)}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    disabled={respondiendo}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmarRechazoPropuesta}
+                    disabled={respondiendo}
+                    className="flex-1 px-4 py-2.5 rounded-xl font-medium text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {respondiendo ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Rechazando...
+                      </>
+                    ) : (
+                      'Confirmar rechazo'
+                    )}
+                  </button>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Selecciona un aula</h3>
-              <p className="text-gray-500">Elige un edificio y un aula para ver su horario y solicitar reservas</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-      {modalReserva.abierto && (
-        <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-7 shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">Solicitar Reserva</h3>
-                <p className="text-sm text-gray-500 mt-1 capitalize">
-                  {modalReserva.dia} • {modalReserva.bloque?.hora} • {aulaSeleccionada?.nombre_aula}
-                </p>
-                {fechaSeleccionada && (
-                  <p className="text-xs text-blue-700 mt-1 font-semibold">
-                    Fecha: {new Date(fechaSeleccionada + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
-                )}
-                {horaFinSeleccionada && cantidadHoras > 1 && (
-                  <p className="text-xs text-blue-600 mt-1">
-                    Hasta: {horaFinSeleccionada.hora} ({cantidadHoras} horas)
-                  </p>
-                )}
-                <p className="text-xs text-gray-400 mt-1">
-                  <span className="font-medium">Disponible:</span> {maxHorasDisponibles} hora(s) consecutivas
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setModalReserva({ abierto: false, dia: null, bloque: null });
-                  setCantidadHoras(1);
-                  setHoraFinSeleccionada(null);
-                  setMaxHorasDisponibles(1);
-                  setFechaSeleccionada('');
-                }}
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all duration-300 hover:rotate-90"
-                disabled={enviando}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Duración de la reserva
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCantidadHoras(1)}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                    cantidadHoras === 1
-                      ? 'bg-[#701330] text-white shadow-md'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  disabled={enviando}
-                >
-                  1 Hora
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (maxHorasDisponibles >= 2) {
-                      setCantidadHoras(2);
-                    } else {
-                      mostrarAlerta('error', 'No hay suficientes bloques disponibles para 2 horas consecutivas');
-                    }
-                  }}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                    cantidadHoras === 2
-                      ? 'bg-[#701330] text-white shadow-md'
-                      : maxHorasDisponibles >= 2
-                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                  disabled={enviando || maxHorasDisponibles < 2}
-                  title={maxHorasDisponibles < 2 ? 'No hay suficientes bloques disponibles' : ''}
-                >
-                  2 Horas
-                  {maxHorasDisponibles < 2 && (
-                    <span className="text-[8px] block text-gray-400">No disponible</span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (maxHorasDisponibles >= 3) {
-                      setCantidadHoras(3);
-                    } else {
-                      mostrarAlerta('error', 'No hay suficientes bloques disponibles para 3 horas consecutivas');
-                    }
-                  }}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                    cantidadHoras === 3
-                      ? 'bg-[#701330] text-white shadow-md'
-                      : maxHorasDisponibles >= 3
-                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                  disabled={enviando || maxHorasDisponibles < 3}
-                  title={maxHorasDisponibles < 3 ? 'No hay suficientes bloques disponibles' : ''}
-                >
-                  3 Horas
-                  {maxHorasDisponibles < 3 && (
-                    <span className="text-[8px] block text-gray-400">No disponible</span>
-                  )}
-                </button>
-              </div>
-              {horaFinSeleccionada && cantidadHoras > 1 && (
-                <p className="text-xs text-gray-500 mt-2">
-                  <span className="font-medium">Rango:</span> {modalReserva.bloque?.hora} - {horaFinSeleccionada.hora}
-                </p>
-              )}
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                solicitarReserva(
-                  modalReserva.dia,
-                  modalReserva.bloque,
-                  formData.get('motivo'),
-                  formData.get('grupo'),
-                  formData.get('tutor'),
-                  cantidadHoras
-                );
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de la reserva
-                </label>
-                <input
-                  type="date"
-                  value={fechaSeleccionada}
-                  onChange={(e) => setFechaSeleccionada(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-                  required
-                  disabled={enviando}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Motivo de la reserva (opcional)
-                </label>
-                <textarea
-                  name="motivo"
-                  rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-                  placeholder="Describe el motivo de la reserva..."
-                  disabled={enviando}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Grupo *
-                </label>
-                <input
-                  type="text"
-                  name="grupo"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-                  placeholder="Ej. DSM 31"
-                  required
-                  disabled={enviando}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tutor *
-                </label>
-                <input
-                  type="text"
-                  name="tutor"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-                  placeholder="Nombre del tutor"
-                  required
-                  disabled={enviando}
-                />
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalReserva({ abierto: false, dia: null, bloque: null });
-                    setCantidadHoras(1);
-                    setHoraFinSeleccionada(null);
-                    setMaxHorasDisponibles(1);
-                    setFechaSeleccionada('');
-                  }}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
-                  disabled={enviando}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={enviando}
-                  className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white bg-[#701330] hover:bg-[#912347] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {enviando ? (
-                    <>
-                      <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Enviando...
-                    </>
-                  ) : (
-                    `Solicitar ${cantidadHoras} Hora${cantidadHoras > 1 ? 's' : ''}`
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {modalRechazoPropuesta && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 animate-fadeIn" onClick={() => setModalRechazoPropuesta(null)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-fadeIn">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800">Rechazar propuesta</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  La propuesta de horario será rechazada y el responsable será notificado.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo (opcional)</label>
-              <textarea
-                value={modalRechazoPropuesta.observaciones || ''}
-                onChange={(e) => setModalRechazoPropuesta({ ...modalRechazoPropuesta, observaciones: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
-                placeholder="Describe el motivo del rechazo..."
-                disabled={respondiendo}
-              />
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setModalRechazoPropuesta(null)}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
-                disabled={respondiendo}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarRechazoPropuesta}
-                disabled={respondiendo}
-                className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
-              >
-                {respondiendo ? 'Rechazando...' : 'Confirmar rechazo'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animate-scaleIn {
+          animation: scaleIn 0.3s ease-out forwards;
         }
         .line-clamp-2 {
           display: -webkit-box;

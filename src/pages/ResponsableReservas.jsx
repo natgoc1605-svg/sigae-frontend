@@ -125,9 +125,19 @@ export default function ResponsableReservas() {
 
   if (!usuario) {
     return (
-      <div className="p-4 md:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg max-w-md">
-          <p className="text-yellow-700">No has iniciado sesión. Por favor, inicia sesión para continuar.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-amber-100 p-8 max-w-md w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-amber-100 rounded-full">
+              <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">No has iniciado sesión</h2>
+              <p className="text-sm text-gray-600 mt-0.5">Por favor, inicia sesión para continuar</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -135,9 +145,22 @@ export default function ResponsableReservas() {
 
   if (!isSuperAdmin(usuario) && !isDirector(usuario)) {
     return (
-      <div className="p-4 md:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg max-w-md">
-          <p className="text-red-700">No tienes permisos para acceder a esta página.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-red-100 p-8 max-w-md w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-red-100 rounded-full">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Acceso Restringido</h2>
+              <p className="text-sm text-gray-600 mt-0.5">No tienes permisos para acceder</p>
+            </div>
+          </div>
+          <p className="text-sm text-red-700 bg-red-50 p-3 rounded-lg">
+            Tu rol actual es: <strong className="text-red-800">{usuario.rol}</strong>
+          </p>
         </div>
       </div>
     );
@@ -145,266 +168,347 @@ export default function ResponsableReservas() {
 
   if (cargando) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#701330] border-t-transparent"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-14 h-14 border-4 border-[#701330]/20 border-t-[#701330] rounded-full animate-spin"></div>
+          <p className="mt-4 text-gray-500 font-medium">Cargando solicitudes...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      {alerta.mostrar && (
-        <div className={`fixed top-6 right-6 z-[100] max-w-md w-full rounded-xl shadow-lg p-4 ${
-          alerta.tipo === 'exito' ? 'bg-green-50 border-l-4 border-green-600 text-green-900' :
-          alerta.tipo === 'error' ? 'bg-red-50 border-l-4 border-red-600 text-red-900' :
-          'bg-blue-50 border-l-4 border-blue-600 text-blue-900'
-        }`}>
-          <div className="flex items-start gap-3">
-            {alerta.tipo === 'exito' && (
-              <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            )}
-            {alerta.tipo === 'error' && (
-              <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            )}
-            <div className="flex-1">
-              <p className="text-sm font-medium whitespace-pre-line">{alerta.mensaje}</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/80">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Alerta flotante */}
+        {alerta.mostrar && (
+          <div className={`fixed top-4 right-4 z-[100] max-w-md w-full rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-fadeIn ${
+            alerta.tipo === 'exito' ? 'bg-green-50 border-2 border-green-200 text-green-800' :
+            alerta.tipo === 'error' ? 'bg-red-50 border-2 border-red-200 text-red-800' :
+            'bg-blue-50 border-2 border-blue-200 text-blue-800'
+          }`}>
+            <div className={`p-1.5 rounded-full flex-shrink-0 ${
+              alerta.tipo === 'exito' ? 'bg-green-200' : 
+              alerta.tipo === 'error' ? 'bg-red-200' : 'bg-blue-200'
+            }`}>
+              {alerta.tipo === 'exito' ? (
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : alerta.tipo === 'error' ? (
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
             </div>
+            <span className="text-sm font-medium flex-1 whitespace-pre-line">{alerta.mensaje}</span>
             <button 
               onClick={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#701330] flex items-center gap-2">
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          Solicitudes de Reserva
-        </h1>
-        <p className="text-gray-500 mt-1">
-          {isSuperAdmin(usuario) 
-            ? 'Como Super Administrador, puedes gestionar todas las solicitudes' 
-            : 'Como responsable del edificio, puedes aprobar o rechazar solicitudes'}
-        </p>
-        <div className="mt-2 flex items-center gap-2">
-          <span className="text-sm text-gray-600">Total pendientes:</span>
-          <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {solicitudes.length}
-          </span>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-[#701330]/10 rounded-xl">
+                <svg className="w-6 h-6 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  Solicitudes de Reserva
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  {isSuperAdmin(usuario) 
+                    ? 'Como Super Administrador, puedes gestionar todas las solicitudes' 
+                    : 'Como responsable del edificio, puedes aprobar o rechazar solicitudes'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600">Pendientes:</span>
+            <span className="px-3.5 py-1.5 bg-amber-100 text-amber-800 rounded-xl text-sm font-semibold flex items-center gap-1.5 shadow-sm">
+              <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {solicitudes.length}
+            </span>
+            <button
+              onClick={cargarSolicitudes}
+              className="p-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-300 hover:rotate-180 hover:shadow-md"
+              title="Actualizar"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Lista de solicitudes */}
+        {solicitudes.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 sm:p-16 text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No hay solicitudes pendientes</h3>
+            <p className="text-gray-500">Todas las solicitudes han sido procesadas</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {solicitudes.map(sol => {
+              const diaSemana = obtenerDiaEnEspanol(sol.fecha_solicitud, sol.dia_semana);
+              let horaInicio = sol.hora_inicio_str;
+              let horaFin = sol.hora_fin_str;
+              if (!horaInicio || !horaFin) {
+                const turnoLower = (sol.turno || '').toLowerCase();
+                if (turnoLower === 'matutino') {
+                  horaInicio = '07:00';
+                  horaFin = '15:10';
+                } else if (turnoLower === 'vespertino') {
+                  horaInicio = '15:20';
+                  horaFin = '21:10';
+                } else {
+                  horaInicio = '07:00';
+                  horaFin = '15:10';
+                }
+              }
+              const tieneHorario = horaInicio && horaFin;
+
+              return (
+                <div 
+                  key={sol.id_solicitud} 
+                  className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  {/* Encabezado */}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="p-2 bg-[#701330]/10 rounded-xl flex-shrink-0">
+                          <svg className="w-5 h-5 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5m1 0V9m8 0v7m-1 0v-3m-1 0v3" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                            {sol.aula_nombre || 'Aula sin nombre'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">
+                              {sol.edificio_nombre || 'Sin edificio'}
+                            </span>
+                            <span className="text-xs text-gray-400">|</span>
+                            <span className="text-xs font-mono font-semibold text-[#701330] bg-[#701330]/5 px-2 py-0.5 rounded-full">
+                              {sol.codigo_solicitud || 'REQ-000'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Horario */}
+                      <div className={`mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border ${
+                        tieneHorario ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                      }`}>
+                        <svg className={`w-4 h-4 ${tieneHorario ? 'text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className={`text-xs font-medium ${tieneHorario ? 'text-blue-700' : 'text-gray-400'}`}>
+                          {tieneHorario 
+                            ? `${diaSemana} • ${horaInicio} - ${horaFin} hrs` 
+                            : `${diaSemana} • Horario no especificado`}
+                        </span>
+                        <span className="text-xs text-gray-300">|</span>
+                        <span className="text-xs text-gray-500">Turno: {sol.turno || 'N/E'}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 flex-wrap flex-shrink-0">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                        sol.estado === 'Pendiente' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                        sol.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border-green-200' :
+                        sol.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border-red-200' :
+                        'bg-gray-100 text-gray-800 border-gray-200'
+                      }`}>
+                        {sol.estado || 'Pendiente'}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {sol.fecha_envio ? new Date(sol.fecha_envio).toLocaleDateString('es-MX', {
+                          day: '2-digit',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) : 'Fecha no disponible'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Detalles */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mb-4 p-3 bg-gray-50/80 rounded-xl border border-gray-100">
+                    <div>
+                      <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Solicitante
+                      </span>
+                      <p className="font-medium text-gray-800 truncate">{sol.solicitante_nombre || 'No especificado'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Fecha
+                      </span>
+                      <p className="font-medium text-gray-800">{formatearFecha(sol.fecha_solicitud)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Día
+                      </span>
+                      <p className="font-medium text-gray-800 capitalize">{diaSemana}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Horario
+                      </span>
+                      <p className={`font-medium ${tieneHorario ? 'text-blue-700' : 'text-gray-400'}`}>
+                        {tieneHorario ? `${horaInicio} - ${horaFin} hrs` : 'No especificado'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Motivo */}
+                  {sol.motivo && (
+                    <div className="mb-4 p-3.5 bg-gray-50 rounded-xl border border-gray-100 text-sm hover:bg-gray-100/50 transition-colors duration-200">
+                      <span className="font-medium text-gray-700 flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Motivo:
+                      </span>
+                      <p className="text-gray-600 mt-1 leading-relaxed">{sol.motivo}</p>
+                    </div>
+                  )}
+
+                  {/* Observaciones del admin */}
+                  {sol.observaciones_admin && (
+                    <div className="mb-4 p-3.5 bg-blue-50 rounded-xl border border-blue-100 text-sm">
+                      <span className="font-medium text-blue-700 flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Observaciones:
+                      </span>
+                      <p className="text-blue-800 mt-1 leading-relaxed">{sol.observaciones_admin}</p>
+                    </div>
+                  )}
+
+                  {/* Acciones */}
+                  {sol.estado === 'Pendiente' ? (
+                    <div className="flex flex-wrap gap-3 mt-2 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => setSolicitudSeleccionada(sol)}
+                        className="flex-1 min-w-[120px] px-5 py-2.5 text-sm font-semibold bg-[#701330] hover:bg-[#912347] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Revisar
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Acción rápida de rechazo podría ir aquí
+                          setSolicitudSeleccionada(sol);
+                        }}
+                        className="px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all duration-200 flex items-center gap-1.5"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Rechazar
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={`mt-2 text-sm font-medium flex items-center gap-1.5 ${
+                      sol.estado === 'Aprobada' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {sol.estado === 'Aprobada' ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                      {sol.estado === 'Aprobada' ? 'Solicitud Aprobada' : 'Solicitud Rechazada'}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Modal Revisar Solicitud */}
+        {solicitudSeleccionada && (
+          <RevisarSolicitud
+            solicitud={solicitudSeleccionada}
+            cerrar={() => {
+              setSolicitudSeleccionada(null);
+              cargarSolicitudes();
+            }}
+            onActualizada={cargarSolicitudes}
+          />
+        )}
       </div>
 
-      {solicitudes.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No hay solicitudes pendientes</h3>
-          <p className="text-gray-500">Todas las solicitudes han sido procesadas</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {solicitudes.map(sol => {
-            const diaSemana = obtenerDiaEnEspanol(sol.fecha_solicitud, sol.dia_semana);
-            // Usar los campos del backend, si no vienen usar fallback por turno
-            let horaInicio = sol.hora_inicio_str;
-            let horaFin = sol.hora_fin_str;
-            if (!horaInicio || !horaFin) {
-              const turnoLower = (sol.turno || '').toLowerCase();
-              if (turnoLower === 'matutino') {
-                horaInicio = '07:00';
-                horaFin = '15:10';
-              } else if (turnoLower === 'vespertino') {
-                horaInicio = '15:20';
-                horaFin = '21:10';
-              } else {
-                horaInicio = '07:00';
-                horaFin = '15:10';
-              }
-            }
-            const tieneHorario = horaInicio && horaFin;
-
-            return (
-              <div key={sol.id_solicitud} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-                {/* ... el resto del renderizado igual que antes, usando diaSemana, horaInicio, horaFin, tieneHorario ... */}
-                {/* (Mantén la estructura exacta, pero reemplaza la parte de horario) */}
-                <div className="flex flex-wrap justify-between items-start gap-3 mb-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5m1 0V9m8 0v7m-1 0v-3m-1 0v3" />
-                      </svg>
-                      <p className="font-medium text-gray-800 text-lg">{sol.aula_nombre || 'Aula sin nombre'}</p>
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                        {sol.edificio_nombre || 'Sin edificio'}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className="text-xs font-semibold bg-[#701330]/10 text-[#701330] px-2 py-0.5 rounded-full font-mono">
-                        {sol.codigo_solicitud || 'REQ-000'}
-                      </span>
-                      <span className="text-xs text-gray-300">|</span>
-                      <span className="text-xs text-gray-400">Turno: {sol.turno || 'No especificado'}</span>
-                    </div>
-                    <div className={`flex flex-wrap items-center gap-2 mt-1 px-3 py-1 rounded-lg border ${
-                      tieneHorario ? 'bg-blue-50 border-blue-100' : 'bg-gray-50 border-gray-200'
-                    }`}>
-                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className={`text-xs font-medium ${tieneHorario ? 'text-blue-700' : 'text-gray-400'}`}>
-                        {tieneHorario 
-                          ? `${diaSemana} de ${horaInicio} a ${horaFin} hrs` 
-                          : `${diaSemana} - Horario no especificado`}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      sol.estado === 'Pendiente' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                      sol.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border border-green-200' :
-                      sol.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border border-red-200' :
-                      'bg-gray-100 text-gray-800 border border-gray-200'
-                    }`}>
-                      {sol.estado || 'Pendiente'}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {sol.fecha_envio ? new Date(sol.fecha_envio).toLocaleDateString('es-MX', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      }) : 'Fecha no disponible'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mb-4">
-                  <div>
-                    <span className="text-gray-500 text-xs flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Solicitante
-                    </span>
-                    <p className="font-medium text-gray-800 truncate">{sol.solicitante_nombre || 'No especificado'}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-xs flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Fecha solicitada
-                    </span>
-                    <p className="font-medium text-gray-800">{formatearFecha(sol.fecha_solicitud)}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-xs flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Día
-                    </span>
-                    <p className="font-medium text-gray-800">{diaSemana}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-xs flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Horario
-                    </span>
-                    <p className={`font-medium ${tieneHorario ? 'text-blue-700' : 'text-gray-400'}`}>
-                      {tieneHorario ? `${horaInicio} - ${horaFin} hrs` : 'No especificado'}
-                    </p>
-                  </div>
-                </div>
-
-                {sol.motivo && (
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100 text-sm">
-                    <span className="font-medium text-gray-700 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      Motivo:
-                    </span>
-                    <p className="text-gray-600 mt-1">{sol.motivo}</p>
-                  </div>
-                )}
-
-                {sol.observaciones_admin && (
-                  <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100 text-sm">
-                    <span className="font-medium text-blue-700 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Observaciones:
-                    </span>
-                    <p className="text-blue-800 mt-1">{sol.observaciones_admin}</p>
-                  </div>
-                )}
-
-                {sol.estado === 'Pendiente' && (
-                  <div className="flex flex-wrap gap-3 mt-2">
-                    <button
-                      onClick={() => setSolicitudSeleccionada(sol)}
-                      className="px-4 py-2 text-sm font-semibold bg-[#701330] hover:bg-[#912347] text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      Revisar
-                    </button>
-                  </div>
-                )}
-
-                {sol.estado !== 'Pendiente' && (
-                  <div className={`mt-2 text-sm font-medium flex items-center gap-1 ${
-                    sol.estado === 'Aprobada' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {sol.estado === 'Aprobada' ? (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                    {sol.estado === 'Aprobada' ? 'Aprobada' : 'Rechazada'}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {solicitudSeleccionada && (
-        <RevisarSolicitud
-          solicitud={solicitudSeleccionada}
-          cerrar={() => {
-            setSolicitudSeleccionada(null);
-            cargarSolicitudes();
-          }}
-          onActualizada={cargarSolicitudes}
-        />
-      )}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animate-slideDown {
+          animation: slideDown 0.3s ease-out forwards;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 }
