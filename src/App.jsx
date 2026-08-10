@@ -14,6 +14,7 @@ import HorarioAula from './components/HorarioAula';
 import DirectorReservas from './pages/DirectorReservas';
 import ResponsableReservas from './pages/ResponsableReservas';
 import Reportes from './pages/Reportes';
+import Historial from './pages/Historial';
 import Configuracion from './pages/Configuracion';
 import Usuarios from './pages/Usuarios';
 import Carreras from './pages/Carreras';
@@ -138,6 +139,15 @@ function App() {
             element={
               <RutaPorRol rolesPermitidos={[ROLES.SUPER_ADMIN, ROLES.DIRECTOR]}>
                 <Reportes />
+              </RutaPorRol>
+            } 
+          />
+
+          <Route 
+            path="/historial" 
+            element={
+              <RutaPorRol rolesPermitidos={[ROLES.SUPER_ADMIN, ROLES.DIRECTOR]}>
+                <Historial />
               </RutaPorRol>
             } 
           />
