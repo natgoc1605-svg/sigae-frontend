@@ -36,6 +36,7 @@ export default function Historial() {
   const [nombreHistorial, setNombreHistorial] = useState('');
   const [alerta, setAlerta] = useState({ mostrar: false, tipo: '', mensaje: '' });
   const [historialActual, setHistorialActual] = useState(null);
+  const [catSecciones, setCatSecciones] = useState({});
 
   const cargarAnios = async () => {
     try {
@@ -534,10 +535,163 @@ export default function Historial() {
           </>
         )}
 
+        {/* Catálogos completos (solo superadmin) */}
+        {datos.catalogos && (
+          <div className="mt-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5m1 0V9m8 0v7m-1 0v-3m-1 0v3" />
+                  </svg>
+                  Catálogos del Sistema
+                  <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">
+                    {Object.keys(datos.catalogos).reduce((acc, k) => acc + (datos.catalogos[k]?.length || 0), 0)} registros
+                  </span>
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">Edificios, aulas, carreras, usuarios, docentes y materias — visibles solo para superadmin</p>
+              </div>
+              <div className="no-print flex gap-2">
+                <button
+                  onClick={() => {
+                    const expandir = Object.keys(datos.catalogos).some(k => !catSecciones[k]);
+                    const nuevo = {};
+                    Object.keys(datos.catalogos).forEach(k => { nuevo[k] = expandir; });
+                    setCatSecciones(nuevo);
+                  }}
+                  className="px-4 py-2 text-xs font-medium text-gray-600 hover:text-[#701330] hover:bg-[#701330]/5 rounded-xl border border-gray-200 transition-all duration-300"
+                >
+                  {Object.keys(datos.catalogos).every(k => catSecciones[k]) ? 'Colapsar todo' : 'Expandir todo (para imprimir)'}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                { key: 'edificios', titulo: 'Edificios', cols: ['Nombre', 'Plantas', 'Aulas', 'Libres', 'Ocupadas', 'Laboratorios', 'Auditorios', 'Estado'] },
+                { key: 'aulas', titulo: 'Aulas', cols: ['Aula', 'Edificio', 'Tipo', 'Planta', 'Capacidad', 'Estado', 'Ocupación'] },
+                { key: 'carreras', titulo: 'Carreras', cols: ['Sigla', 'Nombre', 'Correo de contacto', 'Usuarios'] },
+                { key: 'usuarios', titulo: 'Usuarios', cols: ['Nombre', 'Correo', 'Rol', 'Carrera'] },
+                { key: 'docentes', titulo: 'Docentes', cols: ['Nombre', 'Sigla', 'Profesión', 'Departamento', 'Correo', 'Estado'] },
+                { key: 'materias', titulo: 'Materias', cols: ['Sigla', 'Nombre', 'Plan educativo'] }
+              ].map(sec => {
+                const lista = datos.catalogos[sec.key] || [];
+                const abierto = catSecciones[sec.key];
+                return (
+                  <div key={sec.key} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button
+                      onClick={() => setCatSecciones(prev => ({ ...prev, [sec.key]: !prev[sec.key] }))}
+                      className="w-full p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between hover:bg-gray-50/50 transition-colors no-print"
+                    >
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 flex items-center gap-2">
+                        {sec.titulo}
+                        <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">{lista.length}</span>
+                      </h4>
+                      <svg className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${abierto ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {abierto && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-gray-50/80 border-b-2 border-gray-200">
+                              {sec.cols.map(col => (
+                                <th key={col} className="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{col}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50">
+                            {sec.key === 'edificios' && lista.map((e, i) => (
+                              <tr key={e.id_edificio} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{e.nombre_edificio}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{e.cantidad_plantas || '—'}</td>
+                                <td className="py-3 px-4 text-gray-700">{e.total_aulas || 0}</td>
+                                <td className="py-3 px-4 text-green-600 font-medium">{e.aulas_libres || 0}</td>
+                                <td className="py-3 px-4 text-red-600 font-medium">{e.aulas_ocupadas || 0}</td>
+                                <td className="py-3 px-4 text-gray-600">{e.tiene_laboratorios ? 'Sí' : 'No'}</td>
+                                <td className="py-3 px-4 text-gray-600">{e.tiene_auditorios ? 'Sí' : 'No'}</td>
+                                <td className="py-3 px-4">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${e.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {e.activo ? 'Activo' : 'Inactivo'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                            {sec.key === 'aulas' && lista.map(a => (
+                              <tr key={a.id_aula} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{a.nombre_aula}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{a.nombre_edificio || '—'}</td>
+                                <td className="py-3 px-4 text-gray-600">{a.nombre_tipo || '—'}</td>
+                                <td className="py-3 px-4 text-gray-600 capitalize">{a.planta || '—'}</td>
+                                <td className="py-3 px-4 text-gray-700">{a.capacidad || 0} lug</td>
+                                <td className="py-3 px-4">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                    a.estado === 'Libre' ? 'bg-green-100 text-green-700 border-green-200' :
+                                    a.estado === 'Parcial' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                    a.estado === 'Ocupado' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-gray-100 text-gray-700 border-gray-200'
+                                  }`}>{a.estado || '—'}</span>
+                                </td>
+                                <td className="py-3 px-4 text-gray-700">{a.porcentaje_ocupacion || 0}%</td>
+                              </tr>
+                            ))}
+                            {sec.key === 'carreras' && lista.map(c => (
+                              <tr key={c.id_carrera} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-mono font-semibold text-[#701330] bg-[#701330]/5 px-2 py-0.5 rounded-full text-xs">{c.sigla || '—'}</span></td>
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{c.nombre_carrera}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{c.email_contacto || '—'}</td>
+                                <td className="py-3 px-4 text-gray-700">{c.total_usuarios || 0}</td>
+                              </tr>
+                            ))}
+                            {sec.key === 'usuarios' && lista.map(u => (
+                              <tr key={u.id_usuario} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{u.nombre || '—'}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{u.email_institucional || '—'}</td>
+                                <td className="py-3 px-4">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    u.rol === 'superadmin' ? 'bg-amber-100 text-amber-700' :
+                                    u.rol === 'director' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                                  }`}>{u.rol || '—'}</span>
+                                </td>
+                                <td className="py-3 px-4 text-gray-600">{u.nombre_carrera || '—'}</td>
+                              </tr>
+                            ))}
+                            {sec.key === 'docentes' && lista.map(d => (
+                              <tr key={d.id_docente} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{d.nombre || '—'}</span></td>
+                                <td className="py-3 px-4"><span className="font-mono text-xs text-[#701330]">{d.sigla || '—'}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{d.profesion || '—'}</td>
+                                <td className="py-3 px-4 text-gray-600">{d.departamento || '—'}</td>
+                                <td className="py-3 px-4 text-gray-600">{d.email || '—'}</td>
+                                <td className="py-3 px-4">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${d.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {d.activo ? 'Activo' : 'Inactivo'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                            {sec.key === 'materias' && lista.map(m => (
+                              <tr key={m.id_materia} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="py-3 px-4"><span className="font-mono font-semibold text-[#701330] bg-[#701330]/5 px-2 py-0.5 rounded-full text-xs">{m.sigla || '—'}</span></td>
+                                <td className="py-3 px-4"><span className="font-semibold text-gray-800">{m.nombre_materia}</span></td>
+                                <td className="py-3 px-4 text-gray-600">{m.nombre_plan || '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Footer del reporte */}
         <div className="mt-6 text-center text-xs text-gray-400 border-t border-gray-100 pt-4">
           <p>Historial generado por SIGAE UTVT • {new Date().toLocaleDateString('es-MX')}</p>
-          <p className="mt-0.5">Reservas del horario y solicitudes de espacios • {textoPeriodo()}</p>
+          <p className="mt-0.5">Reservas del horario, solicitudes de espacios y catálogos del sistema • {textoPeriodo()}</p>
         </div>
       </div>
 
