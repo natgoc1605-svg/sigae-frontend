@@ -287,9 +287,11 @@ export default function Edificios() {
         tiene_laboratorios: edificioActual.tiene_laboratorios || false,
         tiene_auditorios: edificioActual.tiene_auditorios || false,
         espacios_especiales: (edificioActual.espacios_especiales || []).map(ee => ({
+          id_espacio: ee.id_espacio ?? null,
           tipo: ee.tipo,
           nombre: ee.nombre || '',
-          planta: ee.planta || 'baja'
+          planta: ee.planta || 'baja',
+          capacidad: ee.capacidad || 30
         }))
       });
       cargarResponsables(edificioActual.id_edificio);
@@ -334,7 +336,7 @@ export default function Edificios() {
   const agregarEspacio = (tipo) => {
     setForm({
       ...form,
-      espacios_especiales: [...form.espacios_especiales, { tipo, nombre: '', planta: 'baja' }]
+      espacios_especiales: [...form.espacios_especiales, { id_espacio: null, tipo, nombre: '', planta: 'baja', capacidad: 30 }]
     });
   };
 
@@ -797,7 +799,14 @@ export default function Edificios() {
                       <input
                         type="checkbox"
                         checked={form.tiene_laboratorios}
-                        onChange={e => setForm({...form, tiene_laboratorios: e.target.checked})}
+                        onChange={e => {
+                          const marcado = e.target.checked;
+                          const espacios = [...form.espacios_especiales];
+                          if (marcado && !espacios.some(ee => ee.tipo === 'laboratorio')) {
+                            espacios.push({ id_espacio: null, tipo: 'laboratorio', nombre: '', planta: 'baja', capacidad: 30 });
+                          }
+                          setForm({...form, tiene_laboratorios: marcado, espacios_especiales: espacios});
+                        }}
                         className="w-4 h-4 text-[#701330] border-gray-300 rounded focus:ring-[#701330] focus:ring-2"
                       />
                       <span className="flex items-center gap-1.5">
@@ -811,7 +820,14 @@ export default function Edificios() {
                       <input
                         type="checkbox"
                         checked={form.tiene_auditorios}
-                        onChange={e => setForm({...form, tiene_auditorios: e.target.checked})}
+                        onChange={e => {
+                          const marcado = e.target.checked;
+                          const espacios = [...form.espacios_especiales];
+                          if (marcado && !espacios.some(ee => ee.tipo === 'auditorio')) {
+                            espacios.push({ id_espacio: null, tipo: 'auditorio', nombre: '', planta: 'baja', capacidad: 30 });
+                          }
+                          setForm({...form, tiene_auditorios: marcado, espacios_especiales: espacios});
+                        }}
                         className="w-4 h-4 text-[#701330] border-gray-300 rounded focus:ring-[#701330] focus:ring-2"
                       />
                       <span className="flex items-center gap-1.5">
@@ -863,7 +879,7 @@ export default function Edificios() {
                           <div className="space-y-2">
                             {form.espacios_especiales.filter(ee => ee.tipo === 'laboratorio').length === 0 ? (
                               <p className="text-xs text-gray-400 bg-white rounded-lg px-3 py-2 border border-dashed border-gray-200">
-                                Opcional: agrega el nombre y la planta de cada laboratorio del edificio
+                                Los laboratorios se crean como aulas: podrás asignarles horarios y reservas desde Infraestructura.
                               </p>
                             ) : (
                               form.espacios_especiales.map((ee, idx) => ee.tipo !== 'laboratorio' ? null : (
@@ -883,6 +899,15 @@ export default function Edificios() {
                                     <option value="baja">Planta baja</option>
                                     <option value="alta">Planta alta</option>
                                   </select>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="999"
+                                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#701330] bg-white text-sm text-center"
+                                    title="Capacidad (personas)"
+                                    value={ee.capacidad || 30}
+                                    onChange={e => actualizarEspacio(idx, 'capacidad', parseInt(e.target.value) || 30)}
+                                  />
                                   <button
                                     type="button"
                                     onClick={() => quitarEspacio(idx)}
@@ -924,7 +949,7 @@ export default function Edificios() {
                           <div className="space-y-2">
                             {form.espacios_especiales.filter(ee => ee.tipo === 'auditorio').length === 0 ? (
                               <p className="text-xs text-gray-400 bg-white rounded-lg px-3 py-2 border border-dashed border-gray-200">
-                                Opcional: indica el nombre del auditorio y si está en planta baja o alta
+                                El auditorio se crea como aula: podrás asignarle horarios y reservas desde Infraestructura.
                               </p>
                             ) : (
                               form.espacios_especiales.map((ee, idx) => ee.tipo !== 'auditorio' ? null : (
@@ -944,6 +969,15 @@ export default function Edificios() {
                                     <option value="baja">Planta baja</option>
                                     <option value="alta">Planta alta</option>
                                   </select>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="999"
+                                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#701330] bg-white text-sm text-center"
+                                    title="Capacidad (personas)"
+                                    value={ee.capacidad || 30}
+                                    onChange={e => actualizarEspacio(idx, 'capacidad', parseInt(e.target.value) || 30)}
+                                  />
                                   <button
                                     type="button"
                                     onClick={() => quitarEspacio(idx)}
