@@ -169,7 +169,10 @@ export default function Infraestructura() {
     const coincideDocencia = docenciaSeleccionada === 'todas' || aula.id_edificio === Number(docenciaSeleccionada);
     const coincidePlanta = filtroPlanta === 'todas' || aula.planta?.toLowerCase() === filtroPlanta.toLowerCase();
     const coincideEstado = filtroEstado === 'todos' || aula.estado === filtroEstado;
-    const coincideBusqueda = aula.nombre_aula?.toLowerCase().includes(busqueda.toLowerCase());
+    const coincideBusqueda = !busqueda || (
+      aula.nombre_aula?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      aula.nombre_tipo?.toLowerCase().includes(busqueda.toLowerCase())
+    );
 
     return coincideEdificio && coincideDocencia && coincidePlanta && coincideEstado && coincideBusqueda;
   });
@@ -496,7 +499,7 @@ export default function Infraestructura() {
                 </svg>
                 <input
                   type="text"
-                  placeholder="Ej: A-101, Lab 1..."
+                  placeholder="A-101, Lab, Auditorio..."
                   value={busqueda}
                   onChange={e => setBusqueda(e.target.value)}
                   className="w-full pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all text-sm placeholder:text-gray-400"
