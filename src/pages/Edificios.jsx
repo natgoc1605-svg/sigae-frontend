@@ -30,7 +30,8 @@ export default function Edificios() {
     observaciones: '',
     cantidad_plantas: 1,
     tiene_laboratorios: false,
-    tiene_auditorios: false
+    tiene_auditorios: false,
+    espacios_especiales: []
   });
 
   const cargar = async () => {
@@ -161,7 +162,8 @@ export default function Edificios() {
       observaciones: '',
       cantidad_plantas: 1,
       tiene_laboratorios: false,
-      tiene_auditorios: false
+      tiene_auditorios: false,
+      espacios_especiales: []
     });
     setResponsables([]);
     setNuevoResponsable('');
@@ -283,7 +285,12 @@ export default function Edificios() {
         observaciones: edificioActual.observaciones || '',
         cantidad_plantas: edificioActual.cantidad_plantas || 1,
         tiene_laboratorios: edificioActual.tiene_laboratorios || false,
-        tiene_auditorios: edificioActual.tiene_auditorios || false
+        tiene_auditorios: edificioActual.tiene_auditorios || false,
+        espacios_especiales: (edificioActual.espacios_especiales || []).map(ee => ({
+          tipo: ee.tipo,
+          nombre: ee.nombre || '',
+          planta: ee.planta || 'baja'
+        }))
       });
       cargarResponsables(edificioActual.id_edificio);
     } else {
@@ -322,6 +329,27 @@ export default function Edificios() {
       case 'ambas': return '#7C3AED';
       default: return '#6B7280';
     }
+  };
+
+  const agregarEspacio = (tipo) => {
+    setForm({
+      ...form,
+      espacios_especiales: [...form.espacios_especiales, { tipo, nombre: '', planta: 'baja' }]
+    });
+  };
+
+  const actualizarEspacio = (idx, campo, valor) => {
+    setForm({
+      ...form,
+      espacios_especiales: form.espacios_especiales.map((ee, i) => i === idx ? { ...ee, [campo]: valor } : ee)
+    });
+  };
+
+  const quitarEspacio = (idx) => {
+    setForm({
+      ...form,
+      espacios_especiales: form.espacios_especiales.filter((_, i) => i !== idx)
+    });
   };
 
   // Si no es SuperAdmin, mostrar mensaje de restriccion
@@ -494,6 +522,24 @@ export default function Edificios() {
                               Auditorios
                             </span>
                           )}
+                        </div>
+                      )}
+
+                      {/* Detalle de laboratorios y auditorios */}
+                      {Array.isArray(e.espacios_especiales) && e.espacios_especiales.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {e.espacios_especiales.map(ee => (
+                            <span
+                              key={ee.id_espacio}
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium ${
+                                ee.tipo === 'laboratorio' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+                              }`}
+                            >
+                              {ee.nombre || (ee.tipo === 'laboratorio' ? 'Laboratorio' : 'Auditorio')}
+                              <span className="opacity-60">·</span>
+                              {getPlantasLabel(ee.planta)}
+                            </span>
+                          ))}
                         </div>
                       )}
 
@@ -790,6 +836,132 @@ export default function Edificios() {
                       placeholder="Información adicional sobre el edificio..."
                     />
                   </div>
+
+                  {/* Detalle de laboratorios y auditorios */}
+                  {(form.tiene_laboratorios || form.tiene_auditorios) && (
+                    <div className="md:col-span-2 space-y-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      {form.tiene_laboratorios && (
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                              </svg>
+                              Laboratorios
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => agregarEspacio('laboratorio')}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-medium transition-colors"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                              Agregar laboratorio
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            {form.espacios_especiales.filter(ee => ee.tipo === 'laboratorio').length === 0 ? (
+                              <p className="text-xs text-gray-400 bg-white rounded-lg px-3 py-2 border border-dashed border-gray-200">
+                                Opcional: agrega el nombre y la planta de cada laboratorio del edificio
+                              </p>
+                            ) : (
+                              form.espacios_especiales.map((ee, idx) => ee.tipo !== 'laboratorio' ? null : (
+                                <div key={idx} className="flex flex-wrap items-center gap-2">
+                                  <input
+                                    type="text"
+                                    className="flex-1 min-w-[180px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all text-sm bg-white"
+                                    placeholder="Nombre del laboratorio (ej: Lab Redes)"
+                                    value={ee.nombre}
+                                    onChange={e => actualizarEspacio(idx, 'nombre', e.target.value)}
+                                  />
+                                  <select
+                                    value={ee.planta || 'baja'}
+                                    onChange={e => actualizarEspacio(idx, 'planta', e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#701330] bg-white text-sm"
+                                  >
+                                    <option value="baja">Planta baja</option>
+                                    <option value="alta">Planta alta</option>
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => quitarEspacio(idx)}
+                                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Quitar laboratorio"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {form.tiene_auditorios && (
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                              <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              Auditorios
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => agregarEspacio('auditorio')}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-xs font-medium transition-colors"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                              Agregar auditorio
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            {form.espacios_especiales.filter(ee => ee.tipo === 'auditorio').length === 0 ? (
+                              <p className="text-xs text-gray-400 bg-white rounded-lg px-3 py-2 border border-dashed border-gray-200">
+                                Opcional: indica el nombre del auditorio y si está en planta baja o alta
+                              </p>
+                            ) : (
+                              form.espacios_especiales.map((ee, idx) => ee.tipo !== 'auditorio' ? null : (
+                                <div key={idx} className="flex flex-wrap items-center gap-2">
+                                  <input
+                                    type="text"
+                                    className="flex-1 min-w-[180px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all text-sm bg-white"
+                                    placeholder="Nombre del auditorio (ej: Auditorio Principal)"
+                                    value={ee.nombre}
+                                    onChange={e => actualizarEspacio(idx, 'nombre', e.target.value)}
+                                  />
+                                  <select
+                                    value={ee.planta || 'baja'}
+                                    onChange={e => actualizarEspacio(idx, 'planta', e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#701330] bg-white text-sm"
+                                  >
+                                    <option value="baja">Planta baja</option>
+                                    <option value="alta">Planta alta</option>
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => quitarEspacio(idx)}
+                                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Quitar auditorio"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Gestión de responsables - solo en edición */}
@@ -885,16 +1057,28 @@ export default function Edificios() {
                                 <option value="alta">Alta</option>
                                 <option value="ambas">Ambas</option>
                               </select>
-                              <button
-                                type="button"
-                                onClick={() => eliminarResponsable(editar.id_edificio, r.id_usuario)}
-                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Eliminar responsable"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
+                              {r.rol === 'superadmin' ? (
+                                <span
+                                  className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-semibold"
+                                  title="El Super Administrador no puede ser removido"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                  </svg>
+                                  Super Admin
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => eliminarResponsable(editar.id_edificio, r.id_usuario)}
+                                  className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Eliminar responsable"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              )}
                             </div>
                           </div>
                         ))
