@@ -87,7 +87,11 @@ export default function ResponsableReservas() {
   const formatearFecha = (fecha) => {
     if (!fecha) return 'Fecha no disponible';
     try {
-      return new Date(fecha).toLocaleDateString('es-MX', {
+      const fechaObj = typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)
+        ? new Date(fecha + 'T12:00:00')
+        : new Date(fecha);
+      if (isNaN(fechaObj.getTime())) return fecha;
+      return fechaObj.toLocaleDateString('es-MX', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
@@ -114,7 +118,9 @@ export default function ResponsableReservas() {
 
     if (fecha) {
       try {
-        const fechaObj = new Date(fecha);
+        const fechaObj = typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)
+          ? new Date(fecha + 'T12:00:00')
+          : new Date(fecha);
         if (!isNaN(fechaObj.getTime())) {
           return fechaObj.toLocaleDateString('es-MX', { weekday: 'long' });
         }
@@ -342,8 +348,8 @@ export default function ResponsableReservas() {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                         sol.estado === 'Pendiente' ? (
                           sol.solicitante_rol === 'superadmin'
-                            ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]'
-                            : 'bg-[#CBD5E1] text-[#1F2937] border-[#64748B]'
+                            ? 'bg-amber-100 text-amber-800 border-amber-400'
+                            : 'bg-gray-200 text-gray-700 border-gray-400'
                         ) :
                         sol.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border-green-200' :
                         sol.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border-red-200' :

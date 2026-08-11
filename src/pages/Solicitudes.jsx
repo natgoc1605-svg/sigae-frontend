@@ -158,8 +158,8 @@ export default function Solicitudes() {
             const esPendiente = sol.estado === 'Pendiente';
             const puedeRevisar = usuario?.rol === 'superadmin' && esPendiente;
             const clasePendiente = sol.solicitante_rol === 'superadmin'
-              ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B]'
-              : 'bg-[#CBD5E1] text-[#1F2937] border-[#64748B]';
+              ? 'bg-amber-100 text-amber-800 border-amber-400'
+              : 'bg-gray-200 text-gray-700 border-gray-400';
 
             return (
               <div

@@ -964,7 +964,12 @@ export default function DirectorReservas() {
                                     {evento.pendiente ? (
                                       <>
                                         <div className="flex items-center gap-1">
-                                          <span className="text-[8px] font-bold uppercase bg-white/60 px-1.5 py-0.5 rounded-full">⏳ En espera</span>
+                                          <span className="flex items-center gap-1 text-[8px] font-bold uppercase bg-white/60 px-1.5 py-0.5 rounded-full">
+                                            <svg className="w-2.5 h-2.5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            En espera
+                                          </span>
                                         </div>
                                         <p className="font-semibold text-xs line-clamp-2">
                                           {evento.codigo_solicitud || 'Solicitud en espera'}

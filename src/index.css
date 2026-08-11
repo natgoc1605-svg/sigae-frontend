@@ -216,6 +216,10 @@ html.tamano-mediano .input, html.tamano-grande .input { font-size: 0.95rem; }
 .dark .text-amber-800 { color: #f6da98; }
 .dark .border-amber-200 { border-color: #4a3c1b; }
 .dark .border-amber-400 { border-color: #d9a13e; }
+.dark .bg-yellow-50 { background-color: #2e2612; }
+.dark .bg-yellow-100 { background-color: #3b3117; }
+.dark .text-yellow-800 { color: #f6da98; }
+.dark .border-yellow-200 { border-color: #4a3c1b; }
 .dark .bg-blue-50 { background-color: #1a283f; }
 .dark .bg-blue-100 { background-color: #213350; }
 .dark .bg-blue-200 { background-color: #2a4164; }

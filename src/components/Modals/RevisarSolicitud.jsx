@@ -537,8 +537,8 @@ function RevisarSolicitud({ solicitud, cerrar, onActualizada }) {
             <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
               solicitud.estado === 'Pendiente' ? (
                 solicitud.solicitante_rol === 'superadmin'
-                  ? 'bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]'
-                  : 'bg-[#CBD5E1] text-[#1F2937] border border-[#64748B]'
+                  ? 'bg-amber-100 text-amber-800 border border-amber-400'
+                  : 'bg-gray-200 text-gray-700 border border-gray-400'
               ) :
               solicitud.estado === 'Aprobada' ? 'bg-green-100 text-green-800 border border-green-200' :
               solicitud.estado === 'Rechazada' ? 'bg-red-100 text-red-800 border border-red-200' :

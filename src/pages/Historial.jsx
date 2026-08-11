@@ -211,7 +211,11 @@ export default function Historial() {
             alerta.tipo === 'error' ? 'bg-red-50 border-2 border-red-200 text-red-800' : 'bg-blue-50'
           }`}>
             <span className="text-sm font-medium flex-1">{alerta.mensaje}</span>
-            <button onClick={() => setAlerta({ mostrar: false })} className="text-gray-400 hover:text-gray-600">✕</button>
+            <button onClick={() => setAlerta({ mostrar: false })} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         )}
 
