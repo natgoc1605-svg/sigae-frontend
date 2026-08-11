@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTema } from '../context/TemaContext';
 import api from '../api/axios';
 
 const getInitials = (nombre) => {
@@ -11,6 +12,7 @@ const getInitials = (nombre) => {
 
 export default function Perfil() {
   const { usuario, actualizarUsuario } = useAuth();
+  const { tamanoLetra, setTamanoLetra } = useTema();
   const [datos, setDatos] = useState({
     nombre: '',
     email: '',
@@ -417,6 +419,39 @@ export default function Perfil() {
                   )}
                 </button>
               </form>
+            </div>
+
+            {/* Preferencias de accesibilidad */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-7 bg-[#701330] rounded-full"></div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Preferencias</h3>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Tamaño de letra</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Agranda el texto para facilitar la lectura</p>
+                </div>
+                <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden bg-gray-50">
+                  {[
+                    { valor: 'normal', etiqueta: 'A' },
+                    { valor: 'mediano', etiqueta: 'A+' },
+                    { valor: 'grande', etiqueta: 'A++' },
+                  ].map((opcion) => (
+                    <button
+                      key={opcion.valor}
+                      onClick={() => setTamanoLetra(opcion.valor)}
+                      className={`px-5 py-2 text-sm font-medium transition-all duration-200 ${
+                        tamanoLetra === opcion.valor
+                          ? 'bg-[#701330] text-white shadow'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {opcion.etiqueta}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
