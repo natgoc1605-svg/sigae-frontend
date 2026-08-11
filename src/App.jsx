@@ -1,6 +1,7 @@
 // App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { TemaProvider } from './context/TemaContext';
 import RutaProtegida, { RutaPorRol } from './components/RutaProtegida';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -28,7 +29,8 @@ function LayoutWrapper({ children }) {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <TemaProvider>
+        <Router>
         <Routes>
           {/* Ruta pública - Login */}
           <Route path="/login" element={<Login />} />
@@ -192,7 +194,8 @@ function App() {
           {/* Redirección para rutas no encontradas */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-      </Router>
+        </Router>
+      </TemaProvider>
     </AuthProvider>
   );
 }

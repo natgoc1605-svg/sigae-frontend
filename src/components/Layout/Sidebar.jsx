@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTema } from '../../context/TemaContext';
 import { hasPermission, ROLES } from '../../utils/auth';
 import api from '../../api/axios';
 
@@ -231,6 +232,7 @@ function MisAulasArbol({ arbol }) {
 
 export default function Sidebar() {
   const { usuario } = useAuth();
+  const { tema, setTema, tamanoLetra, setTamanoLetra } = useTema();
   const [colapsado, setColapsado] = useState(false);
   const [pendientes, setPendientes] = useState(null);
   const [arbolMisAulas, setArbolMisAulas] = useState([]);
@@ -443,6 +445,52 @@ export default function Sidebar() {
               </ItemLink>
             </>
           )}
+
+          <SeccionTitulo>Apariencia</SeccionTitulo>
+
+          <div className="px-3 space-y-2">
+            <button
+              onClick={() => setTema(tema === 'oscuro' ? 'claro' : 'oscuro')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm"
+              title="Cambiar entre modo claro y modo noche"
+            >
+              <span className="flex items-center gap-2">
+                {tema === 'oscuro' ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                )}
+                {tema === 'oscuro' ? 'Modo claro' : 'Modo noche'}
+              </span>
+              <span className={`w-2 h-2 rounded-full ${tema === 'oscuro' ? 'bg-indigo-300 animate-pulse' : 'bg-white/40'}`}></span>
+            </button>
+
+            <div className="grid grid-cols-3 gap-1.5">
+              {[
+                { valor: 'normal', etiqueta: 'A' },
+                { valor: 'mediano', etiqueta: 'A+' },
+                { valor: 'grande', etiqueta: 'A++' },
+              ].map((opcion) => (
+                <button
+                  key={opcion.valor}
+                  onClick={() => setTamanoLetra(opcion.valor)}
+                  className={`px-2 py-2 rounded-lg text-sm transition-colors ${
+                    tamanoLetra === opcion.valor
+                      ? 'bg-white/25 font-bold ring-1 ring-white/40'
+                      : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                  title={`Tamaño de letra ${opcion.etiqueta}`}
+                >
+                  {opcion.etiqueta}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-auto pt-4 border-t border-white/15 mx-3 mb-3">
             <ItemLink to="/perfil" icon={Iconos.perfil}>
