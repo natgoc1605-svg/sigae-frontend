@@ -555,16 +555,34 @@ export default function Infraestructura() {
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                 Estado
               </label>
-              <select
-                value={filtroEstado}
-                onChange={e => setFiltroEstado(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all text-sm"
-              >
-                <option value="todos">Todos</option>
-                <option value="Libre">🟢 Libre</option>
-                <option value="Parcial">🟡 Parcial</option>
-                <option value="Ocupado">🔴 Ocupado</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { valor: 'todos', texto: 'Todos' },
+                  { valor: 'Libre', texto: 'Libre' },
+                  { valor: 'Parcial', texto: 'Parcial' },
+                  { valor: 'Ocupado', texto: 'Ocupado' }
+                ].map(op => {
+                  const estilo = op.valor === 'todos' ? { color: COLORS.gray } : getEstiloEstado(op.valor);
+                  const activo = filtroEstado === op.valor;
+                  return (
+                    <button
+                      key={op.valor}
+                      type="button"
+                      onClick={() => setFiltroEstado(op.valor)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-all duration-200 flex-1 min-w-[70px]"
+                      style={{
+                        backgroundColor: activo ? estilo.color : '#ffffff',
+                        borderColor: activo ? estilo.color : '#e5e7eb',
+                        color: activo ? '#ffffff' : '#374151',
+                        boxShadow: activo ? `0 4px 12px -2px ${estilo.color}66` : 'none'
+                      }}
+                    >
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: activo ? '#ffffff' : estilo.color }} />
+                      {op.texto}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex items-end">

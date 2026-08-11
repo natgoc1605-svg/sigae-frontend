@@ -506,7 +506,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
               {[
                 { path: '/infraestructura', label: 'Infraestructura', desc: 'Edificios y aulas', icon: 'building' },
-                { path: '/solicitudes', label: 'Solicitudes', desc: 'Gestionar solicitudes', icon: 'file' },
+                { path: esSuperAdmin ? '/solicitudes' : '/director/reservas', label: 'Solicitudes', desc: esSuperAdmin ? 'Gestionar solicitudes' : 'Ver mis solicitudes', icon: 'file' },
                 { path: '/horarios', label: 'Horarios', desc: 'Ver y editar', icon: 'calendar' },
                 { path: '/reportes', label: 'Reportes', desc: 'Estadísticas', icon: 'chart' },
                 ...(esSuperAdmin ? [{ path: '/configuracion', label: 'Configuración', desc: 'Usuarios y ajustes', icon: 'settings' }] : [])
