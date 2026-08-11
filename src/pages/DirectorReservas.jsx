@@ -819,7 +819,7 @@ export default function DirectorReservas() {
                 <svg className="w-4 h-4 text-[#701330]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H9zm0 0H6a2 2 0 01-2-2v-3a2 2 0 012-2h3" />
                 </svg>
-                Aulas
+                Espacios
                 <span className="text-xs text-gray-400 font-normal ml-auto">{aulas.length}</span>
               </label>
               <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
@@ -848,7 +848,18 @@ export default function DirectorReservas() {
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{aula.nombre_aula}</div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-sm truncate">{aula.nombre_aula}</span>
+                          {aula.nombre_tipo && aula.nombre_tipo !== 'Aula' && (
+                            <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                              aula.nombre_tipo === 'Laboratorio'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-purple-100 text-purple-700'
+                            }`}>
+                              {aula.nombre_tipo}
+                            </span>
+                          )}
+                        </div>
                         <div className={`text-[11px] truncate ${
                           aulaSeleccionada?.id_aula === aula.id_aula ? 'text-white/80' : 'text-gray-500'
                         }`}>
@@ -869,7 +880,18 @@ export default function DirectorReservas() {
                 <div className="mb-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">{aulaSeleccionada.nombre_aula}</h2>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-xl font-bold text-gray-900">{aulaSeleccionada.nombre_aula}</h2>
+                        {aulaSeleccionada.nombre_tipo && aulaSeleccionada.nombre_tipo !== 'Aula' && (
+                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            aulaSeleccionada.nombre_tipo === 'Laboratorio'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {aulaSeleccionada.nombre_tipo}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-500">
                         {aulaSeleccionada.nombre_edificio} • Planta {aulaSeleccionada.planta} • {aulaSeleccionada.capacidad} lugares
                       </p>

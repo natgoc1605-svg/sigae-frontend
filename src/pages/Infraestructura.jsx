@@ -375,21 +375,48 @@ export default function Infraestructura() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setFiltroEstado(filtroEstado === 'Libre' ? 'todos' : 'Libre')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm transition-all duration-200 cursor-pointer hover:scale-105 ${
+                  filtroEstado === 'Libre'
+                    ? 'bg-green-100 border-2 border-green-500 ring-2 ring-green-200'
+                    : 'bg-green-50 border border-green-100 hover:bg-green-100'
+                }`}
+                title="Filtrar espacios libres"
+              >
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 <span className="text-xs sm:text-sm font-semibold text-green-700">{resumenGeneral.libres}</span>
                 <span className="text-xs text-green-500 hidden sm:inline">Libres</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100 shadow-sm">
+              </button>
+              <button
+                type="button"
+                onClick={() => setFiltroEstado(filtroEstado === 'Parcial' ? 'todos' : 'Parcial')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm transition-all duration-200 cursor-pointer hover:scale-105 ${
+                  filtroEstado === 'Parcial'
+                    ? 'bg-amber-100 border-2 border-amber-500 ring-2 ring-amber-200'
+                    : 'bg-amber-50 border border-amber-100 hover:bg-amber-100'
+                }`}
+                title="Filtrar espacios en uso parcial"
+              >
                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                 <span className="text-xs sm:text-sm font-semibold text-amber-700">{resumenGeneral.parciales}</span>
                 <span className="text-xs text-amber-500 hidden sm:inline">Parciales</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 border border-red-100 shadow-sm">
+              </button>
+              <button
+                type="button"
+                onClick={() => setFiltroEstado(filtroEstado === 'Ocupado' ? 'todos' : 'Ocupado')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm transition-all duration-200 cursor-pointer hover:scale-105 ${
+                  filtroEstado === 'Ocupado'
+                    ? 'bg-red-100 border-2 border-red-500 ring-2 ring-red-200'
+                    : 'bg-red-50 border border-red-100 hover:bg-red-100'
+                }`}
+                title="Filtrar espacios ocupados"
+              >
                 <span className="w-2 h-2 rounded-full bg-red-500"></span>
                 <span className="text-xs sm:text-sm font-semibold text-red-700">{resumenGeneral.ocupadas}</span>
                 <span className="text-xs text-red-500 hidden sm:inline">Ocupadas</span>
-              </div>
+              </button>
               <button 
                 onClick={handleActualizarAula}
                 className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-all duration-300 hover:rotate-180 hover:shadow-md"
