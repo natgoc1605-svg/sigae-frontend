@@ -284,3 +284,202 @@ html.tamano-mediano .input, html.tamano-grande .input { font-size: 0.95rem; }
     --tw-gradient-to: #ffffff !important;
   }
 }
+
+/* ===== MODO OSCURO - CLASES ADICIONALES ===== */
+
+/* Textos con color institucional en modo oscuro */
+.dark .text-\[\#701330\] { color: #e59daa; }
+.dark .hover\:text-\[\#701330\]:hover { color: #f0b3bd; }
+.dark .group:hover .group-hover\:text-\[\#701330\] { color: #e59daa; }
+.dark .bg-\[\#701330\]\/5 { background-color: rgba(112, 19, 48, 0.15); }
+.dark .bg-\[\#701330\]\/10 { background-color: rgba(112, 19, 48, 0.2); }
+.dark .hover\:bg-\[\#701330\]\/5:hover { background-color: rgba(112, 19, 48, 0.15); }
+.dark .hover\:bg-\[\#701330\]\/10:hover { background-color: rgba(112, 19, 48, 0.2); }
+.dark .border-\[\#701330\]\/10 { border-color: rgba(112, 19, 48, 0.2); }
+.dark .border-\[\#701330\]\/20 { border-color: rgba(112, 19, 48, 0.3); }
+
+/* Fondo de las tarjetas en modo oscuro */
+.dark .bg-white { background-color: #1f2533; }
+.dark .bg-white\/80 { background-color: rgba(31, 37, 51, 0.8); }
+.dark .bg-white\/90 { background-color: rgba(31, 37, 51, 0.9); }
+.dark .bg-white\/95 { background-color: rgba(31, 37, 51, 0.95); }
+
+/* Fondos de degradado */
+.dark .from-gray-50 { --tw-gradient-from: #1a2130; }
+.dark .from-gray-100 { --tw-gradient-from: #232b3d; }
+.dark .from-white { --tw-gradient-from: #1f2533; }
+.dark .via-white { --tw-gradient-stops: var(--tw-gradient-from), #1f2533, var(--tw-gradient-to); }
+.dark .via-gray-50 { --tw-gradient-stops: var(--tw-gradient-from), #1a2130, var(--tw-gradient-to); }
+.dark .to-gray-50 { --tw-gradient-to: #1a2130; }
+.dark .to-gray-50\/80 { --tw-gradient-to: rgb(26 33 48 / 0.8); }
+.dark .to-gray-100 { --tw-gradient-to: #232b3d; }
+.dark .to-gray-100\/50 { --tw-gradient-to: rgb(35 43 61 / 0.5); }
+.dark .to-white { --tw-gradient-to: #1f2533; }
+
+/* Gradientes de colores de estado */
+.dark .from-green-50 { --tw-gradient-from: #122a1b; }
+.dark .to-green-100 { --tw-gradient-to: #163424; }
+.dark .from-red-50 { --tw-gradient-from: #2b1a1e; }
+.dark .to-red-100 { --tw-gradient-to: #3a2126; }
+.dark .from-amber-50 { --tw-gradient-from: #2d2513; }
+.dark .to-amber-100 { --tw-gradient-to: #3a2f16; }
+
+/* Sombras en modo oscuro */
+.dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4); }
+.dark .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+.dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6); }
+.dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7); }
+.dark .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+.dark .hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+.dark .hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6); }
+.dark .hover\:shadow-xl:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7); }
+
+/* Dropdown y selects en modo oscuro */
+.dark select option {
+  background-color: #1f2533;
+  color: #e2e8f0;
+}
+
+.dark select option:hover {
+  background-color: #2f3a4f;
+}
+
+/* Modales en modo oscuro */
+.dark .fixed .bg-white {
+  background-color: #1f2533;
+}
+
+.dark .fixed .bg-gray-50 {
+  background-color: #1a2130;
+}
+
+.dark .fixed .bg-gray-100 {
+  background-color: #232b3d;
+}
+
+.dark .fixed .border-gray-100 {
+  border-color: #2f3a4f;
+}
+
+.dark .fixed .border-gray-200 {
+  border-color: #39455c;
+}
+
+/* Backdrop de modales */
+.dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark .bg-black\/55 {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* Toast y notificaciones */
+.dark .bg-green-50 {
+  background-color: #122a1b;
+  border-color: #1e4630;
+}
+.dark .bg-red-50 {
+  background-color: #2b1a1e;
+  border-color: #4d2a30;
+}
+.dark .bg-amber-50 {
+  background-color: #2d2513;
+  border-color: #4a3c1b;
+}
+.dark .bg-blue-50 {
+  background-color: #1a283f;
+  border-color: #2a4164;
+}
+
+.dark .text-green-800 { color: #74e0a0; }
+.dark .text-red-800 { color: #f59da2; }
+.dark .text-amber-800 { color: #f0c97e; }
+.dark .text-blue-800 { color: #8ebaf7; }
+
+/* Inputs en modo oscuro - más específicos */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #232b3d;
+  border-color: #39455c;
+  color: #e2e8f0;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #5b6a82;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #701330;
+  ring-color: rgba(112, 19, 48, 0.3);
+}
+
+/* Tablas en modo oscuro - más específicas */
+.dark table th {
+  background-color: #232b3d;
+  border-color: #39455c;
+  color: #c6d1e2;
+}
+
+.dark table td {
+  border-color: #2f3a4f;
+  color: #d6deea;
+}
+
+.dark table tr:hover td {
+  background-color: #232c40;
+}
+
+/* Scrollbar para el sidebar en modo oscuro */
+.dark .sidebar-scroll {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.dark .sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Estilos para tablas en modo oscuro - HorarioAula */
+.dark .horario-table th {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+.dark .horario-table td {
+  border-color: #374151;
+}
+
+.dark .horario-table tr:hover td {
+  background-color: rgba(55, 65, 81, 0.5);
+}
+
+.dark .horario-table .bg-white {
+  background-color: #1f2937;
+}
+
+/* Scrollbar para el contenido del modal en modo oscuro */
+.dark .modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark .modal-scroll::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark .modal-scroll::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+
+.dark .modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

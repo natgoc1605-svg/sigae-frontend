@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserId, isDirector, isSuperAdmin } from '../utils/auth';
 import api from '../api/axios';
+import { useTema } from '../context/TemaContext';
 
 const DIAS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 
@@ -35,74 +36,31 @@ const COLORS = {
   border: '#E5E7EB',
 };
 
-// Paleta de colores pastel VARIADA - Distribución equitativa de tonos
+// Paleta de colores pastel VARIADA
 const PALETA_PASTEL_VARIADA = [
-  // Rojos y Rosas (4)
-  { h: 340, s: 45, l: 82 },  // Rosa pastel
-  { h: 350, s: 40, l: 78 },  // Rosa claro
-  { h: 5, s: 50, l: 75 },    // Rojo suave
-  { h: 15, s: 45, l: 75 },   // Rojo rosado
-  
-  // Naranjas y Amarillos (6) - ¡más variedad!
-  { h: 25, s: 55, l: 75 },   // Durazno
-  { h: 35, s: 50, l: 72 },   // Melocotón
-  { h: 40, s: 45, l: 70 },   // Naranja pastel
-  { h: 45, s: 50, l: 68 },   // Ámbar claro
-  { h: 50, s: 55, l: 65 },   // Amarillo
-  { h: 55, s: 50, l: 62 },   // Amarillo mostaza
-  
-  // Verdes (5)
-  { h: 70, s: 45, l: 60 },   // Verde lima claro
-  { h: 85, s: 50, l: 58 },   // Verde manzana
-  { h: 105, s: 45, l: 58 },  // Verde pastel
-  { h: 125, s: 40, l: 58 },  // Verde esmeralda claro
-  { h: 145, s: 45, l: 62 },  // Verde menta
-  
-  // Turquesas y Azules (5)
-  { h: 165, s: 50, l: 65 },  // Verde agua
-  { h: 180, s: 55, l: 65 },  // Turquesa claro
-  { h: 195, s: 55, l: 65 },  // Azul turquesa
-  { h: 210, s: 50, l: 62 },  // Azul cielo
-  { h: 220, s: 45, l: 58 },  // Azul medio claro
-  
-  // Azules profundos y Violetas (4)
-  { h: 230, s: 50, l: 58 },  // Azul profundo claro
-  { h: 245, s: 50, l: 62 },  // Azul lavanda
-  { h: 260, s: 45, l: 62 },  // Lila
-  { h: 275, s: 40, l: 58 },  // Violeta claro
-  
-  // Púrpuras y Magentas (4)
-  { h: 290, s: 35, l: 58 },  // Púrpura claro
-  { h: 305, s: 40, l: 62 },  // Malva
-  { h: 320, s: 45, l: 68 },  // Rosa palo
-  { h: 335, s: 50, l: 72 },  // Fucsia claro
-  
-  // Tonos tierra (4)
-  { h: 15, s: 35, l: 58 },   // Terracota claro
-  { h: 25, s: 30, l: 55 },   // Café claro
-  { h: 35, s: 25, l: 52 },   // Marrón claro
-  { h: 45, s: 20, l: 48 },   // Oliva claro
+  { h: 340, s: 45, l: 82 }, { h: 350, s: 40, l: 78 }, { h: 5, s: 50, l: 75 }, { h: 15, s: 45, l: 75 },
+  { h: 25, s: 55, l: 75 }, { h: 35, s: 50, l: 72 }, { h: 40, s: 45, l: 70 }, { h: 45, s: 50, l: 68 },
+  { h: 50, s: 55, l: 65 }, { h: 55, s: 50, l: 62 }, { h: 70, s: 45, l: 60 }, { h: 85, s: 50, l: 58 },
+  { h: 105, s: 45, l: 58 }, { h: 125, s: 40, l: 58 }, { h: 145, s: 45, l: 62 }, { h: 165, s: 50, l: 65 },
+  { h: 180, s: 55, l: 65 }, { h: 195, s: 55, l: 65 }, { h: 210, s: 50, l: 62 }, { h: 220, s: 45, l: 58 },
+  { h: 230, s: 50, l: 58 }, { h: 245, s: 50, l: 62 }, { h: 260, s: 45, l: 62 }, { h: 275, s: 40, l: 58 },
+  { h: 290, s: 35, l: 58 }, { h: 305, s: 40, l: 62 }, { h: 320, s: 45, l: 68 }, { h: 335, s: 50, l: 72 },
+  { h: 15, s: 35, l: 58 }, { h: 25, s: 30, l: 55 }, { h: 35, s: 25, l: 52 }, { h: 45, s: 20, l: 48 },
 ];
 
-// Generador de colores pastel variados
 function generarColorBase(texto) {
   let hash = 0;
   for (let i = 0; i < texto.length; i++) {
     hash = texto.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
   const index = Math.abs(hash % PALETA_PASTEL_VARIADA.length);
   const color = PALETA_PASTEL_VARIADA[index];
-  
-  // Variación controlada para diferenciación
   const variacion = (hash % 10) - 5;
   const sFinal = Math.min(65, Math.max(25, color.s + variacion));
   const lFinal = Math.min(85, Math.max(55, color.l + (variacion * 0.3)));
-  
   return `hsl(${color.h}, ${sFinal}%, ${lFinal}%)`;
 }
 
-// Función para oscurecer un color (para la franja) - más oscuro para contraste
 function oscurecerColor(hexColor, porcentaje = 35) {
   if (hexColor.startsWith('hsl')) {
     const match = hexColor.match(/hsl\(([^,]+),\s*([^%]+)%,\s*([^%]+)%\)/);
@@ -114,7 +72,6 @@ function oscurecerColor(hexColor, porcentaje = 35) {
     }
     return hexColor;
   }
-  
   const hex = hexColor.replace('#', '');
   let r, g, b;
   if (hex.length === 3) {
@@ -132,7 +89,6 @@ function oscurecerColor(hexColor, porcentaje = 35) {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Función para determinar si un color es claro u oscuro
 function esColorClaro(hexColor) {
   if (hexColor.startsWith('hsl')) {
     const match = hexColor.match(/hsl\(([^,]+),\s*([^%]+)%,\s*([^%]+)%\)/);
@@ -142,7 +98,6 @@ function esColorClaro(hexColor) {
     }
     return true;
   }
-  
   const hex = hexColor.replace('#', '');
   let r, g, b;
   if (hex.length === 3) {
@@ -173,13 +128,13 @@ function bloqueHora(bloque) {
   return bloque && bloque.hora ? bloque.hora : '—';
 }
 
-function renderDetalle(etiqueta, valor, sub = '', destacado = false) {
+function renderDetalle(etiqueta, valor, sub = '', destacado = false, isDark = false) {
   return (
-    <div className={`p-3 rounded-lg border text-sm ${destacado ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-100'}`}>
-      <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-500">{etiqueta}</p>
-      <p className="font-semibold text-gray-800 mt-0.5 leading-snug">
+    <div className={`p-3 rounded-lg border text-sm ${destacado ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' : isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
+      <p className={`text-[11px] uppercase tracking-wide font-semibold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{etiqueta}</p>
+      <p className={`font-semibold mt-0.5 leading-snug ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
         {valor}
-        {sub ? <span className="text-gray-500 font-normal"> ({sub})</span> : null}
+        {sub ? <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'} font-normal`}> ({sub})</span> : null}
       </p>
     </div>
   );
@@ -197,6 +152,8 @@ function etiquetaRol(rol) {
 
 export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = false, onActualizarAula }) {
   const { usuario } = useAuth();
+  const { tema } = useTema();
+  const isDark = tema === 'oscuro';
   const { id: idParam } = useParams();
   const navigate = useNavigate();
   const esPagina = !aulaProp;
@@ -259,7 +216,6 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
 
   const [coloresMateria, setColoresMateria] = useState({});
 
-  // Función para limpiar el cache de colores de una materia específica
   const limpiarCacheColor = (nombreMateria) => {
     if (nombreMateria) {
       setColoresMateria(prev => {
@@ -270,30 +226,24 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
     }
   };
 
-  // Función para obtener colores de una materia
   const obtenerColorMateria = (nombreMateria, siglaMateria, colorGuardado, forzarRecalculo = false) => {
     let colorBase;
     const clave = nombreMateria || siglaMateria || 'default';
     
-    // Si tiene color guardado en la base de datos, usarlo siempre (prioridad)
     if (colorGuardado && colorGuardado !== '#FDF2F6' && colorGuardado !== '#e2e8f0' && colorGuardado !== '#701330') {
       colorBase = colorGuardado;
     } else if (!forzarRecalculo && coloresMateria[clave]) {
-      // Usar cache solo si no se fuerza recálculo
       return coloresMateria[clave];
     } else {
-      // Generar nuevo color
       colorBase = generarColorBase(clave);
     }
     
-    // Guardar en caché
     const nuevoColor = {
       fondo: colorBase,
-      borde: oscurecerColor(colorBase, 35), // Más oscuro para la franja
+      borde: oscurecerColor(colorBase, 35),
       texto: obtenerColorContraste(colorBase)
     };
     
-    // Solo guardar en cache si no tiene color guardado en BD
     if (!colorGuardado || colorGuardado === '#FDF2F6' || colorGuardado === '#e2e8f0' || colorGuardado === '#701330') {
       setColoresMateria(prev => ({ ...prev, [clave]: nuevoColor }));
     }
@@ -449,11 +399,8 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
         const nuevoColor = formData.color;
         const colorOriginal = modal.datos?.color || modal.datos?.materia_color;
         
-        // Si cambió el color, limpiar cache y actualizar todas las ocurrencias
         if (nombreMateria && nuevoColor && colorOriginal && nuevoColor !== colorOriginal) {
-          // Limpiar cache de la materia
           limpiarCacheColor(nombreMateria);
-          
           try {
             await api.patch('/api/horarios/materia/color', {
               nombre_materia: nombreMateria,
@@ -656,19 +603,19 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
   if (!aula) {
     if (cargandoAula) {
       return (
-        <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className={`flex items-center justify-center h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="text-center">
-            <div className="inline-block w-10 h-10 border-4 border-gray-200 border-t-[#701330] rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-500 animate-pulse">Cargando aula...</p>
+            <div className="inline-block w-10 h-10 border-4 border-gray-200 dark:border-gray-700 border-t-[#701330] rounded-full animate-spin mb-4"></div>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'} animate-pulse`}>Cargando aula...</p>
           </div>
         </div>
       );
     }
     if (esPagina) {
       return (
-        <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className={`flex items-center justify-center h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="text-center">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Aula no encontrada</h2>
+            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} mb-2`}>Aula no encontrada</h2>
             <button
               onClick={() => navigate('/dashboard')}
               className="px-4 py-2 text-sm font-semibold bg-[#701330] hover:bg-[#912347] text-white rounded-lg transition-colors"
@@ -706,13 +653,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
   const ocupacion = calcularOcupacion();
 
   return (
-    <div className={esPagina ? 'min-h-screen bg-gray-100 p-4 md:p-6' : 'fixed inset-0 bg-gray-900/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm'}>
+    <div className={esPagina ? `${isDark ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen p-4 md:p-6` : 'fixed inset-0 bg-black/60 dark:bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm'}>
       {alerta.mostrar && (
         <div className={`fixed top-6 right-6 z-[100] max-w-md w-full rounded-xl shadow-lg p-4 flex items-center gap-3 animate-fadeIn ${
-          alerta.tipo === 'exito' ? 'bg-green-50 border-l-4 border-green-600 text-green-900' :
-          alerta.tipo === 'error' ? 'bg-red-50 border-l-4 border-red-600 text-red-900' :
-          alerta.tipo === 'info' ? 'bg-blue-50 border-l-4 border-blue-600 text-blue-900' :
-          'bg-gray-50 border-l-4 border-gray-500 text-gray-900'
+          alerta.tipo === 'exito' ? 'bg-green-50 dark:bg-green-900/30 border-l-4 border-green-600 dark:border-green-400 text-green-900 dark:text-green-300' :
+          alerta.tipo === 'error' ? 'bg-red-50 dark:bg-red-900/30 border-l-4 border-red-600 dark:border-red-400 text-red-900 dark:text-red-300' :
+          alerta.tipo === 'info' ? 'bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-600 dark:border-blue-400 text-blue-900 dark:text-blue-300' :
+          'bg-gray-50 dark:bg-gray-800 border-l-4 border-gray-500 dark:border-gray-400 text-gray-900 dark:text-gray-300'
         }`}>
           <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {alerta.tipo === 'exito' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />}
@@ -720,21 +667,24 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
             {alerta.tipo === 'info' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />}
           </svg>
           <span className="text-sm font-medium">{alerta.mensaje}</span>
+          <button onClick={() => setAlerta({ mostrar: false, tipo: '', mensaje: '' })} className="ml-auto text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col`}>
         {/* Cabecera */}
-        <div className="px-4 sm:px-6 py-4 border-b border-[#701330]/20 flex flex-wrap items-center justify-between gap-4 bg-white">
+        <div className={`px-4 sm:px-6 py-4 border-b ${isDark ? 'border-gray-700' : 'border-[#701330]/20'} flex flex-wrap items-center justify-between gap-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex items-center gap-4 flex-wrap">
-            <h2 className="text-2xl font-bold text-[#701330]">{aula.nombre_aula}</h2>
+            <h2 className={`text-2xl font-bold ${isDark ? 'text-[#e59daa]' : 'text-[#701330]'}`}>{aula.nombre_aula}</h2>
             
-            <div className="flex bg-gray-100 rounded-xl overflow-hidden shadow-sm">
-              <button onClick={() => setTurnoSeleccionado('matutino')} className={`px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-2 ${turnoSeleccionado === 'matutino' ? 'bg-[#701330] text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}>
+            <div className={`flex rounded-xl overflow-hidden shadow-sm ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <button onClick={() => setTurnoSeleccionado('matutino')} className={`px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-2 ${turnoSeleccionado === 'matutino' ? 'bg-[#701330] text-white shadow-md' : isDark ? 'text-gray-300 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-200'}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 Matutino
               </button>
-              <button onClick={() => setTurnoSeleccionado('vespertino')} className={`px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-2 ${turnoSeleccionado === 'vespertino' ? 'bg-[#701330] text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}>
+              <button onClick={() => setTurnoSeleccionado('vespertino')} className={`px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-2 ${turnoSeleccionado === 'vespertino' ? 'bg-[#701330] text-white shadow-md' : isDark ? 'text-gray-300 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-200'}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" /></svg>
                 Vespertino
               </button>
@@ -752,15 +702,15 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                     {subiendo ? 'Procesando...' : 'Subir Excel'}
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1.5 shadow-sm">
-                    <select value={grupoSeleccionado} onChange={(e) => setGrupoSeleccionado(e.target.value)} className="px-3 py-1.5 text-sm bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/50 min-w-[140px]">
+                  <div className={`flex items-center gap-2 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-xl p-1.5 shadow-sm`}>
+                    <select value={grupoSeleccionado} onChange={(e) => setGrupoSeleccionado(e.target.value)} className={`px-3 py-1.5 text-sm ${isDark ? 'bg-gray-600 text-white' : 'bg-white text-gray-800'} rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/50 min-w-[140px]`}>
                       <option value="">Seleccionar grupo</option>
                       {gruposDisponibles.map((g, idx) => <option key={idx} value={g.grupo}>{g.grupo}</option>)}
                     </select>
                     <button onClick={manejarSubirHorario} disabled={!grupoSeleccionado || subiendo} className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-300 ${grupoSeleccionado && !subiendo ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}>
                       {subiendo ? 'Cargando...' : 'Subir'}
                     </button>
-                    <button onClick={cancelarSeleccionGrupo} className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg">Cancelar</button>
+                    <button onClick={cancelarSeleccionGrupo} className={`px-3 py-1.5 text-sm font-medium ${isDark ? 'text-gray-300 hover:bg-gray-600' : 'text-gray-600 hover:bg-gray-200'} rounded-lg`}>Cancelar</button>
                   </div>
                 )}
                 <input type="file" id="input-excel-horario" accept=".xlsx,.xls" style={{ display: 'none' }} onChange={manejarSeleccionArchivo} />
@@ -768,46 +718,46 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
             )}
           </div>
           
-          <button onClick={() => (onCerrar ? onCerrar() : navigate('/dashboard'))} className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-all duration-300 hover:rotate-90" title="Cerrar">
+          <button onClick={() => (onCerrar ? onCerrar() : navigate('/dashboard'))} className={`w-9 h-9 flex items-center justify-center rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800'} transition-all duration-300 hover:rotate-90`} title="Cerrar">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="px-6 py-2.5 bg-gray-50 border-b border-gray-200">
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+        <div className={`px-6 py-2.5 border-b ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+          <div className={`flex flex-wrap items-center gap-3 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-gray-400"></span>
               Planta {aula.planta}
             </span>
-            <span className="text-gray-300">|</span>
+            <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>|</span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-blue-400"></span>
               {aula.capacidad} lugares
             </span>
-            <span className="text-gray-300">|</span>
+            <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>|</span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-purple-400"></span>
               {aula.nombre_edificio || 'Sin edificio'}
             </span>
-            <span className="text-gray-300">|</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium text-xs">
+            <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>|</span>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-medium text-xs ${isDark ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700'}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
               Ocupación: {ocupacion.porcentaje}% ({ocupacion.ocupados}/{ocupacion.total})
             </span>
-            <span className="text-gray-300">|</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium text-xs">
+            <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>|</span>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-medium text-xs ${isDark ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800'}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
               Grupo: {grupoDelHorario}
             </span>
             {(gruposDelHorario.length > 1 || true) && (
               <>
-                <span className="text-gray-300">|</span>
+                <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>|</span>
                 <select
                   value={filtroGrupo}
                   onChange={(e) => setFiltroGrupo(e.target.value)}
-                  className="px-2 py-0.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20"
+                  className={`px-2 py-0.5 text-xs border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-800'}`}
                   title="Filtrar por grupo"
                 >
                   <option value="">Todos los grupos</option>
@@ -815,25 +765,21 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                 </select>
                 <button
                   onClick={() => setSoloOtrasDocencias(v => !v)}
-                  className={`px-2.5 py-0.5 text-xs font-medium rounded-lg border transition-all duration-200 ${soloOtrasDocencias ? 'bg-[#701330] text-white border-[#701330]' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  className={`px-2.5 py-0.5 text-xs font-medium rounded-lg border transition-all duration-200 ${soloOtrasDocencias ? 'bg-[#701330] text-white border-[#701330]' : isDark ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                   title="Ocultar tus propias reservas para ver solo las de otras docencias"
                 >
                   Otras docencias
                 </button>
               </>
             )}
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              Grupo: {grupoDelHorario}
-            </span>
             {!permisoReal && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium text-xs">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-medium text-xs ${isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                 Solo lectura
               </span>
             )}
             {permisoReal && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-green-100 text-green-700 font-medium text-xs">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-medium text-xs ${isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 Edición activa
               </span>
@@ -841,25 +787,25 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
           </div>
         </div>
 
-        <div className="overflow-auto p-4 bg-gray-50/50 flex-1">
+        <div className={`overflow-auto p-4 flex-1 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50/50'}`}>
           {cargando ? (
             <div className="py-24 text-center">
-              <div className="inline-block w-10 h-10 border-4 border-gray-200 border-t-[#701330] rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-500 animate-pulse">Cargando horario...</p>
+              <div className="inline-block w-10 h-10 border-4 border-gray-200 dark:border-gray-700 border-t-[#701330] rounded-full animate-spin mb-4"></div>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'} animate-pulse`}>Cargando horario...</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse bg-white rounded-xl shadow-sm">
+              <table className={`w-full border-collapse ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-sm`}>
                 <thead>
                   <tr>
-                    <th className="border-b border-gray-200 bg-gray-50 p-3 text-left text-sm font-semibold text-gray-700 w-32">HORA</th>
-                    {DIAS.map(dia => <th key={dia} className="border-b border-gray-200 bg-gray-50 p-3 text-center text-sm font-semibold text-gray-700 capitalize">{dia}</th>)}
+                    <th className={`border-b p-3 text-left text-sm font-semibold w-32 ${isDark ? 'border-gray-700 bg-gray-700/50 text-gray-300' : 'border-gray-200 bg-gray-50 text-gray-700'}`}>HORA</th>
+                    {DIAS.map(dia => <th key={dia} className={`border-b p-3 text-center text-sm font-semibold capitalize ${isDark ? 'border-gray-700 bg-gray-700/50 text-gray-300' : 'border-gray-200 bg-gray-50 text-gray-700'}`}>{dia}</th>)}
                   </tr>
                 </thead>
                 <tbody>
                   {bloquesFiltrados.map((bloque) => (
-                    <tr key={bloque.inicio} className="hover:bg-gray-50/70 transition-colors duration-200">
-                      <td className="border-b border-gray-100 p-3 text-sm font-medium text-gray-700 whitespace-nowrap">{bloque.hora}</td>
+                    <tr key={bloque.inicio} className={`transition-colors duration-200 ${isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50/70'}`}>
+                      <td className={`border-b p-3 text-sm font-medium whitespace-nowrap ${isDark ? 'border-gray-700 text-gray-300' : 'border-gray-100 text-gray-700'}`}>{bloque.hora}</td>
                       {DIAS.map(dia => {
                         const evento = horarioFiltrado.find(e => {
                           const diaCoincide = normalizarTexto(e.dia_semana || e.dia) === normalizarTexto(dia);
@@ -881,7 +827,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                           const creadorSuperAdmin = evento.rol_creador === 'superadmin';
                           reservaDeOtroDirector = esDirector && !esSuperAdmin && evento.id_usuario && evento.id_usuario !== idDirector && !creadorSuperAdmin;
                           if (reservaDeOtroDirector) {
-                            colores = { fondo: '#B0BEC5', borde: '#78909C', texto: '#FFFFFF' };
+                            colores = { fondo: isDark ? '#4A5568' : '#B0BEC5', borde: isDark ? '#2D3748' : '#78909C', texto: isDark ? '#E2E8F0' : '#FFFFFF' };
                           } else {
                             colores = obtenerColorMateria(nombreMat, siglaMat, colorGuardado);
                           }
@@ -891,12 +837,12 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                         if (esPendiente) {
                           const creadorSuperAdmin = evento.rol_creador === 'superadmin';
                           colores = creadorSuperAdmin
-                            ? { fondo: '#FEF3C7', borde: '#F59E0B', texto: '#92400E' }
-                            : { fondo: '#CBD5E1', borde: '#64748B', texto: '#1F2937' };
+                            ? { fondo: isDark ? '#92400E' : '#FEF3C7', borde: isDark ? '#B45309' : '#F59E0B', texto: isDark ? '#FDE68A' : '#92400E' }
+                            : { fondo: isDark ? '#374151' : '#CBD5E1', borde: isDark ? '#4B5563' : '#64748B', texto: isDark ? '#D1D5DB' : '#1F2937' };
                         }
                         
                         return (
-                          <td key={dia} className="border-b border-gray-100 p-1 align-top relative">
+                          <td key={dia} className={`border-b p-1 align-top relative ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                             {evento ? (
                               <div 
                                 onClick={(e) => { e.stopPropagation(); setEventoDetalle({ evento, dia, bloque }); }}
@@ -906,12 +852,12 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                   borderLeftColor: colores ? colores.borde : COLORS.primary,
                                   borderLeftWidth: '6px'
                                 }}
-                                className="w-full h-[96px] p-2 rounded-lg relative group transition-all duration-200 hover:shadow-md border-l-4 text-xs flex flex-col justify-between overflow-hidden"
+                                className="w-full h-[96px] p-2 rounded-lg relative group transition-all duration-200 hover:shadow-md border-l-4 text-xs flex flex-col justify-between overflow-hidden cursor-pointer"
                               >
                                 <div className="flex flex-wrap items-center gap-1">
                                   {esPendiente && (
                                     <span 
-                                      className="font-bold uppercase bg-white/40 px-1.5 py-0.5 rounded shadow-sm text-[9px]"
+                                      className="font-bold uppercase bg-white/40 dark:bg-black/30 px-1.5 py-0.5 rounded shadow-sm text-[9px]"
                                       style={{ color: colores ? colores.texto : COLORS.primary }}
                                     >
                                       En espera
@@ -919,14 +865,14 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                   )}
                                   {!esPendiente && evento.sigla_grupo && (
                                     <span 
-                                      className="font-bold bg-white/30 px-1.5 py-0.5 rounded shadow-sm text-[10px]"
+                                      className="font-bold bg-white/30 dark:bg-black/20 px-1.5 py-0.5 rounded shadow-sm text-[10px]"
                                       style={{ color: colores ? colores.texto : COLORS.primary }}
                                     >
                                       {evento.sigla_grupo}
                                     </span>
                                   )}
                                   {!esPendiente && evento.sigla_carrera && (
-                                    <span className="font-mono bg-white/20 px-1.5 py-0.5 rounded text-[9px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
+                                    <span className="font-mono bg-white/20 dark:bg-black/20 px-1.5 py-0.5 rounded text-[9px]" style={{ color: colores ? colores.texto : (isDark ? '#9CA3AF' : '#4B5563') }}>
                                       {evento.sigla_carrera}
                                     </span>
                                   )}
@@ -937,7 +883,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                 >
                                   {esPendiente ? (evento.codigo_solicitud || 'Solicitud en espera') : (evento.sigla_materia || evento.nombre_materia)}
                                 </p>
-                                <div className="flex flex-wrap items-center gap-x-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
+                                <div className="flex flex-wrap items-center gap-x-1 text-[10px]" style={{ color: colores ? colores.texto : (isDark ? '#9CA3AF' : '#4B5563') }}>
                                   {esPendiente ? (
                                     <span>Pendiente de aprobación</span>
                                   ) : (
@@ -945,7 +891,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                   )}
                                 </div>
                                 {!esPendiente && evento.nombre_creador && evento.rol_creador === 'director' && (
-                                  <div className="flex flex-wrap items-center gap-1 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
+                                  <div className="flex flex-wrap items-center gap-1 text-[10px]" style={{ color: colores ? colores.texto : (isDark ? '#9CA3AF' : '#4B5563') }}>
                                     <span
                                       title={`${evento.nombre_creador}${etiquetaRol(evento.rol_creador)}`}
                                       className="px-1.5 py-0.5 rounded font-bold bg-amber-500/90 text-white"
@@ -955,8 +901,8 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500" title="Reserva aprobada"></span>
                                   </div>
                                 )}
-                                <div className="flex flex-wrap items-center gap-x-2 text-[10px]" style={{ color: colores ? colores.texto : '#4B5563' }}>
-                                  {!esPendiente && evento.aula_clase && <span className="bg-white/20 px-1.5 py-0.5 rounded">Aula: {evento.aula_clase}</span>}
+                                <div className="flex flex-wrap items-center gap-x-2 text-[10px]" style={{ color: colores ? colores.texto : (isDark ? '#9CA3AF' : '#4B5563') }}>
+                                  {!esPendiente && evento.aula_clase && <span className="bg-white/20 dark:bg-black/20 px-1.5 py-0.5 rounded">Aula: {evento.aula_clase}</span>}
                                 </div>
                                 {eventoOtro && (
                                   <div className="absolute bottom-1 right-1 bg-amber-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
@@ -964,12 +910,12 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                                   </div>
                                 )}
                                 {permisoReal && !esPendiente && (
-                                  <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded p-0.5 shadow-sm">
-                                    <button onClick={(e) => { e.stopPropagation(); abrirEditarAsignacion(evento, dia, bloque); }} className="p-1 rounded hover:bg-gray-100" title="Editar">
-                                      <svg className="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                  <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-gray-700/90 rounded p-0.5 shadow-sm">
+                                    <button onClick={(e) => { e.stopPropagation(); abrirEditarAsignacion(evento, dia, bloque); }} className={`p-1 rounded ${isDark ? 'hover:bg-gray-600' : 'hover:bg-gray-100'}`} title="Editar">
+                                      <svg className={`w-3 h-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     </button>
-                                    <button onClick={(e) => { e.stopPropagation(); setConfirmar({ titulo: 'Eliminar asignación', mensaje: '¿Eliminar esta asignación del horario?', accion: () => eliminarAsignacion(evento.id), confirmarTexto: 'Sí, eliminar', tipo: 'peligro' }); }} className="p-1 rounded hover:bg-red-50" title="Eliminar">
-                                      <svg className="w-3 h-3 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    <button onClick={(e) => { e.stopPropagation(); setConfirmar({ titulo: 'Eliminar asignación', mensaje: '¿Eliminar esta asignación del horario?', accion: () => eliminarAsignacion(evento.id), confirmarTexto: 'Sí, eliminar', tipo: 'peligro' }); }} className={`p-1 rounded ${isDark ? 'hover:bg-gray-600' : 'hover:bg-red-50'}`} title="Eliminar">
+                                      <svg className={`w-3 h-3 ${isDark ? 'text-red-400' : 'text-red-700'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                   </div>
                                 )}
@@ -978,8 +924,8 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                               <div 
                                 className={`w-full h-[96px] flex items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300 cursor-pointer ${
                                   permisoReal 
-                                    ? 'border-gray-300 hover:border-[#701330] hover:bg-[#FDF2F6]' 
-                                    : 'border-gray-200 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
+                                    ? isDark ? 'border-gray-600 hover:border-[#701330] hover:bg-[#701330]/20' : 'border-gray-300 hover:border-[#701330] hover:bg-[#FDF2F6]' 
+                                    : isDark ? 'border-gray-700 bg-gray-800/50 hover:border-blue-400 hover:bg-blue-900/20' : 'border-gray-200 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
                                 }`}
                                 onClick={() => {
                                   if (permisoReal) {
@@ -991,13 +937,13 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                               >
                                 <div className="flex flex-col items-center gap-1">
                                   {permisoReal ? (
-                                    <span className="text-gray-400 text-2xl font-light">+</span>
+                                    <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} text-2xl font-light`}>+</span>
                                   ) : (
                                     <>
-                                      <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <svg className={`w-5 h-5 ${isDark ? 'text-blue-500' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                       </svg>
-                                      <span className="text-gray-400 text-[9px]">Solicitar</span>
+                                      <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} text-[9px]`}>Solicitar</span>
                                     </>
                                   )}
                                 </div>
@@ -1017,31 +963,21 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
               </table>
 
               {horario.length > 0 && (
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span className="text-sm font-medium text-gray-700">Tutor del grupo:</span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-medium">
+                <div className={`mt-3 flex flex-wrap items-center gap-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <span className="text-sm font-medium">Tutor del grupo:</span>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium ${isDark ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-800'}`}>
                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                     {tutorGrupo}
                   </span>
                   {permisoReal && (tutorGrupo === 'Sin tutor' || tutorGrupo === 'Sin asignar') && (
-                    <button
-                      onClick={() => abrirAsignarTutor(grupoDelHorario, '')}
-                      className="px-3 py-1 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-all duration-300 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
+                    <button className="px-3 py-1 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-all duration-300 flex items-center gap-1" onClick={() => abrirAsignarTutor(grupoDelHorario, '')}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                       Asignar Tutor
                     </button>
                   )}
                   {permisoReal && tutorGrupo !== 'Sin tutor' && tutorGrupo !== 'Sin asignar' && (
-                    <button
-                      onClick={() => abrirAsignarTutor(grupoDelHorario, tutorGrupo)}
-                      className="px-3 py-1 text-sm font-semibold bg-gray-600 hover:bg-gray-700 text-white rounded-lg shadow-md transition-all duration-300 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
+                    <button className="px-3 py-1 text-sm font-semibold bg-gray-600 hover:bg-gray-700 text-white rounded-lg shadow-md transition-all duration-300 flex items-center gap-1" onClick={() => abrirAsignarTutor(grupoDelHorario, tutorGrupo)}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                       Editar Tutor
                     </button>
                   )}
@@ -1049,8 +985,8 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
               )}
 
               {horario.length > 0 && materiasUnicas.length > 0 && (
-                <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                  <p className="text-xs font-semibold text-gray-700 mb-2">Materias en este horario:</p>
+                <div className={`mt-4 p-3 rounded-lg border shadow-sm ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-white border-gray-200'}`}>
+                  <p className={`text-xs font-semibold mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Materias en este horario:</p>
                   <div className="flex flex-wrap gap-2">
                     {materiasUnicas.map((e) => {
                       const nombreMat = e.nombre_materia || e.sigla_materia || '';
@@ -1060,10 +996,11 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                       return (
                         <span 
                           key={siglaMat || nombreMat} 
-                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border border-gray-200"
+                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border"
                           style={{ 
-                            backgroundColor: colores ? colores.fondo : '#e5e7eb',
-                            color: colores ? colores.texto : '#1f2937'
+                            backgroundColor: colores ? colores.fondo : (isDark ? '#374151' : '#e5e7eb'),
+                            color: colores ? colores.texto : (isDark ? '#D1D5DB' : '#1f2937'),
+                            borderColor: isDark ? '#4B5563' : '#D1D5DB'
                           }}
                         >
                           <span 
@@ -1078,10 +1015,10 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                 </div>
               )}
 
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-gray-600 bg-white/70 px-3 py-2 rounded-lg border border-gray-200/60">
-                <span className="font-semibold text-gray-700">Leyenda:</span>
+              <div className={`mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] ${isDark ? 'text-gray-400 bg-gray-800/50 border-gray-700' : 'text-gray-600 bg-white/70 border-gray-200/60'} px-3 py-2 rounded-lg border`}>
+                <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Leyenda:</span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#CBD5E1', border: '1px solid #64748B' }}></span>
+                  <span className="w-3 h-3 rounded" style={{ backgroundColor: isDark ? '#4A5568' : '#CBD5E1', border: '1px solid #64748B' }}></span>
                   Espera de aprobación (director)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
@@ -1093,16 +1030,16 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                   Reserva aprobada
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded" style={{ backgroundColor: '#B0BEC5', border: '1px solid #78909C' }}></span>
+                  <span className="w-3 h-3 rounded" style={{ backgroundColor: isDark ? '#4A5568' : '#B0BEC5', border: '1px solid #64748B' }}></span>
                   Otra docencia (incidencia)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded bg-gray-300"></span>
+                  <span className="w-3 h-3 rounded bg-gray-300 dark:bg-gray-600"></span>
                   Bloque del otro turno
                 </span>
               </div>
 
-              <div className="mt-4 text-xs text-gray-500 text-center bg-white/70 py-2 rounded-lg">
+              <div className={`mt-4 text-xs text-center ${isDark ? 'text-gray-400 bg-gray-800/50' : 'text-gray-500 bg-white/70'} py-2 rounded-lg`}>
                 {getAyudaTexto()}
               </div>
             </div>
@@ -1110,66 +1047,56 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
         </div>
       </div>
 
-      {/* Modales */}
+      {/* Modales - los mismos modales con clases dark: */}
       {modal.abierto && permisoReal && (
-        <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 shadow-xl">
+        <div className="fixed inset-0 bg-black/55 dark:bg-black/70 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
+          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 shadow-xl`}>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{modal.tipo === 'nueva' ? 'Nueva Asignación' : 'Editar Asignación'}</h3>
-                <p className="text-sm text-gray-500 mt-1 capitalize">{modal.celda?.dia} • {modal.celda?.bloque?.inicio}–{modal.celda?.bloque?.fin} • {aula.nombre_aula}</p>
+                <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{modal.tipo === 'nueva' ? 'Nueva Asignación' : 'Editar Asignación'}</h3>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1 capitalize`}>{modal.celda?.dia} • {modal.celda?.bloque?.inicio}–{modal.celda?.bloque?.fin} • {aula.nombre_aula}</p>
               </div>
-              <button onClick={() => setModal({ abierto: false, tipo: 'nueva', datos: null, celda: null })} className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all duration-300 hover:rotate-90">
+              <button onClick={() => setModal({ abierto: false, tipo: 'nueva', datos: null, celda: null })} className={`w-9 h-9 flex items-center justify-center rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-500'} transition-all duration-300 hover:rotate-90`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <form onSubmit={(e) => { e.preventDefault(); const datos = Object.fromEntries(new FormData(e.target)); guardarAsignacion(datos); }} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Carrera</label>
-                <select name="id_carrera" defaultValue={modal.datos?.id_carrera || ''} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" required>
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Carrera</label>
+                <select name="id_carrera" defaultValue={modal.datos?.id_carrera || ''} className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`} required>
                   <option value="">Seleccionar carrera</option>
                   {carreras.map(c => <option key={c.id} value={c.id}>{c.sigla} — {c.nombre}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Materia
-                  {modal.datos?.sigla_materia && (
-                    <span className="text-gray-400 font-normal"> ({modal.datos.sigla_materia})</span>
-                  )}
-                </label>
-                <input type="text" name="nombre_materia" defaultValue={modal.datos?.nombre_materia || ''} placeholder="Ej. Programación Avanzada" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" required />
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Materia{modal.datos?.sigla_materia && <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} font-normal`}> ({modal.datos.sigla_materia})</span>}</label>
+                <input type="text" name="nombre_materia" defaultValue={modal.datos?.nombre_materia || ''} placeholder="Ej. Programación Avanzada" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Profesor
-                  {modal.datos?.sigla_docente && (
-                    <span className="text-gray-400 font-normal"> ({modal.datos.sigla_docente})</span>
-                  )}
-                </label>
-                <select name="id_docente" defaultValue={modal.datos?.id_docente || ''} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" required>
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Profesor{modal.datos?.sigla_docente && <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} font-normal`}> ({modal.datos.sigla_docente})</span>}</label>
+                <select name="id_docente" defaultValue={modal.datos?.id_docente || ''} className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`} required>
                   <option value="">Seleccionar profesor</option>
                   {docentes.map(d => <option key={d.id_docente || d.id} value={d.id_docente || d.id}>{d.nombre}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grupo / Sigla</label>
-                <input type="text" name="sigla" defaultValue={modal.datos?.sigla_grupo || ''} placeholder="Ej. DSM 31" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" />
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Grupo / Sigla</label>
+                <input type="text" name="sigla" defaultValue={modal.datos?.sigla_grupo || ''} placeholder="Ej. DSM 31" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Aula (lugar físico)</label>
-                <input type="text" name="aula_clase" defaultValue={modal.datos?.aula_clase || ''} placeholder="Ej. E1 A108" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" />
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Aula (lugar físico)</label>
+                <input type="text" name="aula_clase" defaultValue={modal.datos?.aula_clase || ''} placeholder="Ej. E1 A108" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tutor del grupo</label>
-                <input type="text" name="tutor_grupo" defaultValue={modal.datos?.tutor_grupo || ''} placeholder="Nombre del tutor" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20" />
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Tutor del grupo</label>
+                <input type="text" name="tutor_grupo" defaultValue={modal.datos?.tutor_grupo || ''} placeholder="Nombre del tutor" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Color de la materia</label>
-                <input type="color" name="color" defaultValue={modal.datos?.color || COLORS.primaryPale} className="w-full h-10 p-1 border border-gray-300 rounded-lg cursor-pointer" />
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Color de la materia</label>
+                <input type="color" name="color" defaultValue={modal.datos?.color || COLORS.primaryPale} className={`w-full h-10 p-1 border rounded-lg cursor-pointer ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`} />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setModal({ abierto: false, tipo: 'nueva', datos: null, celda: null })} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button type="button" onClick={() => setModal({ abierto: false, tipo: 'nueva', datos: null, celda: null })} className={`flex-1 px-4 py-2.5 border rounded-lg font-medium ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>Cancelar</button>
                 <button type="submit" className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-white transition-all duration-300 shadow-md hover:shadow-lg ${modal.tipo === 'nueva' ? 'bg-[#701330] hover:bg-[#912347]' : 'bg-[#912347] hover:bg-[#701330]'}`}>
                   {modal.tipo === 'nueva' ? 'Asignar' : 'Actualizar'}
                 </button>
