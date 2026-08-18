@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
 import HorarioAula from '../components/HorarioAula';
 import { hasPermission, ROLES } from '../utils/auth';
 import { useAuth } from '../context/AuthContext';
+
+const COLOR_ESTADO = {
+  Libre: '#10b981',
+  Parcial: '#f59e0b',
+  Ocupado: '#ef4444'
+};
+
+const ESTADOS = ['Todos', 'Libre', 'Parcial', 'Ocupado'];
 
 export default function Horarios() {
   const { usuario } = useAuth();
@@ -10,6 +18,13 @@ export default function Horarios() {
   const [aulaSeleccionada, setAulaSeleccionada] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [edificiosPermitidos, setEdificiosPermitidos] = useState([]);
+
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('Todos');
+  const [filtroEdificio, setFiltroEdificio] = useState('');
+  const [filtroPlanta, setFiltroPlanta] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [orden, setOrden] = useState('nombre');
 
   const esSuperAdmin = usuario && hasPermission(usuario, [ROLES.SUPER_ADMIN]);
   const esDirector = usuario && hasPermission(usuario, [ROLES.DIRECTOR]);
@@ -50,6 +65,67 @@ export default function Horarios() {
       .then(res => setAulas(res.data || []))
       .catch(err => console.error('Error actualizando:', err));
   };
+
+  const limpiarFiltros = () => {
+    setBusqueda('');
+    setFiltroEstado('Todos');
+    setFiltroEdificio('');
+    setFiltroPlanta('');
+    setFiltroTipo('');
+    setOrden('nombre');
+  };
+
+  const edificios = useMemo(() => {
+    const mapa = new Map();
+    aulas.forEach(a => { if (a.nombre_edificio) mapa.set(a.nombre_edificio, a.nombre_edificio); });
+    return [...mapa.values()].sort((a, b) => a.localeCompare(b));
+  }, [aulas]);
+
+  const plantas = useMemo(() => {
+    const mapa = new Map();
+    aulas.forEach(a => { if (a.planta) mapa.set(a.planta, a.planta); });
+    return [...mapa.values()].sort((a, b) => a.localeCompare(b));
+  }, [aulas]);
+
+  const tipos = useMemo(() => {
+    const mapa = new Map();
+    aulas.forEach(a => { if (a.nombre_tipo) mapa.set(a.nombre_tipo, a.nombre_tipo); });
+    return [...mapa.values()].sort((a, b) => a.localeCompare(b));
+  }, [aulas]);
+
+  const conteosEstado = useMemo(() => {
+    const conteos = { Libre: 0, Parcial: 0, Ocupado: 0 };
+    aulas.forEach(a => { if (conteos[a.estado] !== undefined) conteos[a.estado] += 1; });
+    return conteos;
+  }, [aulas]);
+
+  const hayFiltrosActivos = busqueda || filtroEstado !== 'Todos' || filtroEdificio || filtroPlanta || filtroTipo || orden !== 'nombre';
+
+  const aulasFiltradas = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    const lista = aulas.filter(a => {
+      if (filtroEstado !== 'Todos' && a.estado !== filtroEstado) return false;
+      if (filtroEdificio && a.nombre_edificio !== filtroEdificio) return false;
+      if (filtroPlanta && a.planta !== filtroPlanta) return false;
+      if (filtroTipo && a.nombre_tipo !== filtroTipo) return false;
+      if (q && !(a.nombre_aula || '').toLowerCase().includes(q) && !(a.nombre_edificio || '').toLowerCase().includes(q)) return false;
+      return true;
+    });
+    switch (orden) {
+      case 'ocupacion_desc':
+        lista.sort((a, b) => (b.porcentaje_ocupacion || 0) - (a.porcentaje_ocupacion || 0));
+        break;
+      case 'ocupacion_asc':
+        lista.sort((a, b) => (a.porcentaje_ocupacion || 0) - (b.porcentaje_ocupacion || 0));
+        break;
+      case 'capacidad':
+        lista.sort((a, b) => (b.capacidad || 0) - (a.capacidad || 0));
+        break;
+      default:
+        lista.sort((a, b) => (a.nombre_aula || '').localeCompare(b.nombre_aula || ''));
+    }
+    return lista;
+  }, [aulas, busqueda, filtroEstado, filtroEdificio, filtroPlanta, filtroTipo, orden]);
 
   if (aulaSeleccionada) {
     return (
@@ -92,7 +168,7 @@ export default function Horarios() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-400">
-              {aulas.length} aula{aulas.length !== 1 ? 's' : ''}
+              {aulasFiltradas.length} de {aulas.length} aula{aulas.length !== 1 ? 's' : ''}
             </span>
             <button
               onClick={actualizarLista}
@@ -103,6 +179,104 @@ export default function Horarios() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
+          </div>
+        </div>
+
+        {/* Panel de filtros */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            <div className="relative flex-1 min-w-[200px]">
+              <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar aula o edificio..."
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all text-sm placeholder:text-gray-400"
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select
+                value={filtroEdificio}
+                onChange={e => setFiltroEdificio(e.target.value)}
+                className="px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#701330]/30 transition-all min-w-[140px]"
+              >
+                <option value="">Todos los edificios</option>
+                {edificios.map(e => <option key={e} value={e}>{e}</option>)}
+              </select>
+              <select
+                value={filtroPlanta}
+                onChange={e => setFiltroPlanta(e.target.value)}
+                className="px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#701330]/30 transition-all min-w-[110px]"
+              >
+                <option value="">Todas las plantas</option>
+                {plantas.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <select
+                value={filtroTipo}
+                onChange={e => setFiltroTipo(e.target.value)}
+                className="px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#701330]/30 transition-all min-w-[140px]"
+              >
+                <option value="">Todos los tipos</option>
+                {tipos.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <select
+                value={orden}
+                onChange={e => setOrden(e.target.value)}
+                className="px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#701330]/30 transition-all min-w-[150px]"
+                title="Ordenar"
+              >
+                <option value="nombre">Nombre (A-Z)</option>
+                <option value="ocupacion_desc">Más ocupadas</option>
+                <option value="ocupacion_asc">Menos ocupadas</option>
+                <option value="capacidad">Mayor capacidad</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Chips por estado con contadores */}
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            {ESTADOS.map(estado => {
+              const activo = filtroEstado === estado;
+              const conteo = estado === 'Todos' ? aulas.length : (conteosEstado[estado] || 0);
+              const color = estado === 'Todos' ? '#701330' : COLOR_ESTADO[estado];
+              return (
+                <button
+                  key={estado}
+                  onClick={() => setFiltroEstado(estado)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                    activo
+                      ? 'text-white shadow-md'
+                      : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-200'
+                  }`}
+                  style={activo ? { backgroundColor: color, borderColor: color } : undefined}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: activo ? '#ffffff' : color }}
+                  ></span>
+                  {estado}
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
+                    activo ? 'bg-white/25' : 'bg-gray-100'
+                  }`}>
+                    {conteo}
+                  </span>
+                </button>
+              );
+            })}
+            {hayFiltrosActivos && (
+              <button
+                onClick={limpiarFiltros}
+                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-[#701330] hover:bg-[#701330]/5 rounded-xl transition-all duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Limpiar filtros
+              </button>
+            )}
           </div>
         </div>
 
@@ -124,10 +298,28 @@ export default function Horarios() {
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No hay aulas registradas</h3>
             <p className="text-gray-500">Agrega aulas en el módulo de infraestructura</p>
           </div>
+        ) : aulasFiltradas.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Sin resultados</h3>
+            <p className="text-gray-500 mb-4">Ningún aula coincide con los filtros aplicados</p>
+            <button
+              onClick={limpiarFiltros}
+              className="px-6 py-2.5 bg-[#701330] hover:bg-[#912347] text-white rounded-xl font-medium transition-all duration-300 hover:shadow-lg"
+            >
+              Limpiar filtros
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-            {aulas.map(aula => {
+            {aulasFiltradas.map(aula => {
               const editable = puedeEditarAula(aula);
+              const pct = aula.porcentaje_ocupacion || 0;
+              const colorEstado = COLOR_ESTADO[aula.estado] || '#9ca3af';
               return (
                 <div
                   key={aula.id_aula}
@@ -174,17 +366,19 @@ export default function Horarios() {
                       <span>Planta {aula.planta} • {aula.capacidad} lugares</span>
                     </p>
                     <p className="text-sm text-gray-500 flex items-center gap-1.5">
-                      <span className={`inline-block w-2 h-2 rounded-full ${
-                        aula.estado === 'Libre' ? 'bg-green-500' :
-                        aula.estado === 'Parcial' ? 'bg-amber-500' :
-                        'bg-red-500'
-                      }`}></span>
+                      <span className={`inline-block w-2 h-2 rounded-full`} style={{ backgroundColor: colorEstado }}></span>
                       <span>{aula.estado || 'Sin estado'}</span>
+                      <span className="text-xs text-gray-400 ml-auto font-semibold">{pct}% ocupado</span>
                     </p>
                   </div>
 
-                  {/* Barra inferior animada */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#701330] to-[#912347] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                  {/* Barra de ocupación */}
+                  <div className="mt-3 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%`, backgroundColor: colorEstado }}
+                    ></div>
+                  </div>
 
                   {/* Flecha indicadora */}
                   <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
@@ -212,6 +406,10 @@ export default function Horarios() {
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-gray-400"></span>
                 <span>Solo vista</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span>Ocupación de la semana</span>
               </span>
             </div>
             <div className="flex items-center gap-2">

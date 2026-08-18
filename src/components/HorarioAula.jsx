@@ -595,7 +595,9 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
     horario.filter(e => !e.pendiente && e.sigla_grupo && e.sigla_grupo !== '---').map(e => e.sigla_grupo)
   )).sort();
   const horarioFiltrado = horario.filter(e => {
-    if (soloOtrasDocencias && e.id_usuario && e.id_usuario === idUsuarioActual) return false;
+    if (soloOtrasDocencias && idUsuarioActual !== null && idUsuarioActual !== undefined
+      && e.id_usuario !== null && e.id_usuario !== undefined
+      && Number(e.id_usuario) === Number(idUsuarioActual)) return false;
     if (filtroGrupo) return (e.sigla_grupo || '').toLowerCase() === filtroGrupo.toLowerCase();
     return true;
   });
@@ -1069,11 +1071,15 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                 </select>
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Materia{modal.datos?.sigla_materia && <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} font-normal`}> ({modal.datos.sigla_materia})</span>}</label>
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Materia</label>
                 <input type="text" name="nombre_materia" defaultValue={modal.datos?.nombre_materia || ''} placeholder="Ej. Programación Avanzada" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} required />
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Profesor{modal.datos?.sigla_docente && <span className={`${isDark ? 'text-gray-500' : 'text-gray-400'} font-normal`}> ({modal.datos.sigla_docente})</span>}</label>
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Sigla de la materia</label>
+                <input type="text" name="sigla_materia" defaultValue={modal.datos?.sigla_materia || ''} placeholder="Ej. PROG-8" className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`} />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Profesor</label>
                 <select name="id_docente" defaultValue={modal.datos?.id_docente || ''} className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`} required>
                   <option value="">Seleccionar profesor</option>
                   {docentes.map(d => <option key={d.id_docente || d.id} value={d.id_docente || d.id}>{d.nombre}</option>)}
@@ -1213,7 +1219,7 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
                       })}
                     </div>
                     <div className="flex flex-wrap gap-3 mt-3">
-                      {[1, 2, 3].map(h => {
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map(h => {
                         const disponible = h <= Math.max(1, maxHorasSolicitud);
                         return (
                           <button
@@ -1333,11 +1339,14 @@ export default function HorarioAula({ aula: aulaProp, onCerrar, puedeEditar = fa
             <div className="flex items-start justify-between gap-3 p-5 border-b border-gray-100 bg-gradient-to-r from-[#FDF2F6] to-white sticky top-0 bg-white">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm" style={{ backgroundColor: eventoDetalle.evento.color && eventoDetalle.evento.color !== '#701330' ? eventoDetalle.evento.color : COLORS.primaryPale, color: COLORS.primary }}>
-                  {getIniciales(eventoDetalle.evento.sigla_materia || eventoDetalle.evento.nombre_materia || '?')}
+                  {getIniciales(eventoDetalle.evento.nombre_materia || eventoDetalle.evento.sigla_materia || '?')}
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">
-                    {eventoDetalle.evento.esPendiente ? 'Solicitud en espera' : (eventoDetalle.evento.sigla_materia || eventoDetalle.evento.nombre_materia || 'Asignación')}
+                    {eventoDetalle.evento.esPendiente ? 'Solicitud en espera' : (eventoDetalle.evento.nombre_materia || 'Asignación')}
+                    {!eventoDetalle.evento.esPendiente && eventoDetalle.evento.sigla_materia && eventoDetalle.evento.sigla_materia !== eventoDetalle.evento.nombre_materia && (
+                      <span className="font-normal text-gray-500 ml-1.5 text-sm">({eventoDetalle.evento.sigla_materia})</span>
+                    )}
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5 capitalize">
                     {eventoDetalle.dia} • {bloqueHora(eventoDetalle.bloque)} • {aula.nombre_aula}
