@@ -1086,8 +1086,8 @@ export default function DirectorReservas() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Duración de la reserva
                   </label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3].map((horas) => (
+                  <div className="flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((horas) => (
                       <button
                         key={horas}
                         type="button"
@@ -1098,7 +1098,7 @@ export default function DirectorReservas() {
                             mostrarAlerta('error', `No hay suficientes bloques disponibles para ${horas} horas consecutivas`);
                           }
                         }}
-                        className={`flex-1 py-2.5 px-3 rounded-xl font-medium transition-all duration-200 ${
+                        className={`flex-1 min-w-[72px] py-2.5 px-3 rounded-xl font-medium transition-all duration-200 ${
                           cantidadHoras === horas
                             ? 'bg-[#701330] text-white shadow-md'
                             : maxHorasDisponibles >= horas
