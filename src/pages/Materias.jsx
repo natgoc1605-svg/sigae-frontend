@@ -39,7 +39,8 @@ export default function Materias() {
     const datos = {
       nombre_materia: formData.get('nombre_materia'),
       id_plan: Number(formData.get('id_plan')),
-      color: formData.get('color') || '#701330'
+      color: formData.get('color') || '#701330',
+      sigla: formData.get('sigla') || null
     };
 
     try {
@@ -102,6 +103,7 @@ export default function Materias() {
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="p-4 text-left text-sm font-semibold text-gray-700">ID</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-700">Nombre</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-700">Sigla</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-700">Plan Educativo</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-700">Color</th>
                 {puedeEditar && <th className="p-4 text-right text-sm font-semibold text-gray-700">Acciones</th>}
@@ -117,6 +119,7 @@ export default function Materias() {
                   <tr key={m.id_materia} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                     <td className="p-4 text-sm text-gray-500">{m.id_materia}</td>
                     <td className="p-4 font-medium text-gray-800">{m.nombre_materia}</td>
+                    <td className="p-4 text-sm text-gray-600">{m.sigla || '—'}</td>
                     <td className="p-4 text-sm text-gray-600">{m.nombre_plan}</td>
                     <td className="p-4">
                       <div className="w-5 h-5 rounded border border-gray-200" style={{ background: m.color }}></div>
@@ -160,6 +163,16 @@ export default function Materias() {
                   name="nombre_materia"
                   defaultValue={modal.datos?.nombre_materia || ''}
                   required
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 bg-white text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sigla:</label>
+                <input
+                  type="text"
+                  name="sigla"
+                  defaultValue={modal.datos?.sigla || ''}
+                  placeholder="Ej. PROG-8"
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 bg-white text-sm"
                 />
               </div>
