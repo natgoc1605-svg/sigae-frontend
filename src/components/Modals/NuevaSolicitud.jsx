@@ -12,6 +12,7 @@ export default function NuevaSolicitud({ cerrar, onCreada }) {
     id_carrera: usuario?.id_carrera || ''
   });
   const [aulas, setAulas] = useState([]);
+  const [carreras, setCarreras] = useState([]);
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
 
@@ -26,6 +27,25 @@ export default function NuevaSolicitud({ cerrar, onCreada }) {
       }
     };
     cargarAulas();
+  }, []);
+
+  useEffect(() => {
+    const cargarCarreras = async () => {
+      try {
+        const res = await api.get('/api/solicitudes-espacio/carreras');
+        const lista = res.data || [];
+        setCarreras(lista);
+        setForm(prev => {
+          const coincide = lista.some(c => String(c.id_carrera) === String(prev.id_carrera));
+          if (coincide || prev.id_carrera) return { ...prev, id_carrera: prev.id_carrera ? String(prev.id_carrera) : '' };
+          if (lista.length === 1) return { ...prev, id_carrera: String(lista[0].id_carrera) };
+          return prev;
+        });
+      } catch (err) {
+        console.error('Error al cargar carreras:', err);
+      }
+    };
+    cargarCarreras();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -114,6 +134,25 @@ export default function NuevaSolicitud({ cerrar, onCreada }) {
               {aulas.map(a => (
                 <option key={a.id_aula} value={a.id_aula}>
                   {a.nombre_aula} ({a.nombre_edificio}) - {a.estado}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Carrera <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={form.id_carrera}
+              onChange={(e) => setForm({ ...form, id_carrera: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#701330]/20 focus:border-[#701330] transition-all bg-white"
+              required
+            >
+              <option value="">Selecciona la carrera</option>
+              {carreras.map(c => (
+                <option key={c.id_carrera} value={String(c.id_carrera)}>
+                  {c.nombre_carrera}{c.sigla ? ` (${c.sigla})` : ''}
                 </option>
               ))}
             </select>

@@ -46,7 +46,7 @@ export default function Usuarios() {
   const [filtroRol, setFiltroRol] = useState('');
   const [cargando, setCargando] = useState(true);
   const [modal, setModal] = useState({ abierto: false, editar: null });
-  const [form, setForm] = useState({ nombre: '', email: '', contrasena: '', rol: 'director', id_carrera: '' });
+  const [form, setForm] = useState({ nombre: '', email: '', contrasena: '', rol: 'director', id_carrera: '', carreras: [] });
   const [guardando, setGuardando] = useState(false);
   const [cambiarContrasena, setCambiarContrasena] = useState(null);
   const [nuevaContrasena, setNuevaContrasena] = useState('');
@@ -91,17 +91,30 @@ export default function Usuarios() {
 
   const abrirNuevo = () => {
     setModal({ abierto: true, editar: null });
-    setForm({ nombre: '', email: '', contrasena: '', rol: 'director', id_carrera: '' });
+    setForm({ nombre: '', email: '', contrasena: '', rol: 'director', id_carrera: '', carreras: [] });
   };
 
   const abrirEditar = (usuario) => {
+    const carrerasDelUsuario = (usuario.carreras && usuario.carreras.length > 0)
+      ? usuario.carreras.map(c => String(c.id_carrera))
+      : (usuario.id_carrera ? [String(usuario.id_carrera)] : []);
     setModal({ abierto: true, editar: usuario });
     setForm({
       nombre: usuario.nombre || '',
       email: usuario.email_institucional || '',
       contrasena: '',
       rol: usuario.rol || 'director',
-      id_carrera: usuario.id_carrera ? String(usuario.id_carrera) : ''
+      id_carrera: usuario.id_carrera ? String(usuario.id_carrera) : '',
+      carreras: carrerasDelUsuario
+    });
+  };
+
+  const toggleCarrera = (idCarrera) => {
+    setForm(prev => {
+      const seleccionadas = prev.carreras.includes(idCarrera)
+        ? prev.carreras.filter(c => c !== idCarrera)
+        : [...prev.carreras, idCarrera];
+      return { ...prev, carreras: seleccionadas };
     });
   };
 
@@ -112,7 +125,8 @@ export default function Usuarios() {
       if (modal.editar) {
         const datos = {
           rol: form.rol,
-          id_carrera: form.id_carrera ? Number(form.id_carrera) : null
+          id_carrera: form.id_carrera ? Number(form.id_carrera) : null,
+          carreras: form.carreras.map(Number)
         };
         if (form.nombre.trim()) datos.nombre = form.nombre.trim();
         await api.put(`/api/usuarios/${modal.editar.id_usuario}`, datos);
@@ -123,7 +137,8 @@ export default function Usuarios() {
           email_institucional: form.email.trim(),
           contrasena: form.contrasena,
           rol: form.rol,
-          id_carrera: form.id_carrera ? Number(form.id_carrera) : null
+          id_carrera: form.id_carrera ? Number(form.id_carrera) : null,
+          carreras: form.carreras.map(Number)
         });
         mostrarAlerta('exito', `Usuario ${etiquetaRol(form.rol).toLowerCase()} creado correctamente`);
       }
@@ -333,9 +348,20 @@ export default function Usuarios() {
                         </span>
                       </td>
                       <td className="p-4 text-sm text-gray-600 hidden md:table-cell">
-                        <span className="truncate block max-w-[150px]">
-                          {u.nombre_carrera || <span className="text-gray-400">—</span>}
-                        </span>
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {(u.carreras && u.carreras.length > 0
+                            ? u.carreras
+                            : (u.nombre_carrera ? [{ nombre_carrera: u.nombre_carrera, sigla: u.sigla }] : [])
+                          ).map((c, i) => (
+                            <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-[#701330]/5 text-[#701330]">
+                              {c.sigla && <span className="font-bold">{c.sigla}</span>}
+                              <span className="truncate max-w-[110px]">{c.nombre_carrera}</span>
+                            </span>
+                          ))}
+                          {!u.nombre_carrera && (!u.carreras || u.carreras.length === 0) && (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <div className="flex justify-end gap-2 flex-wrap">
@@ -485,19 +511,40 @@ export default function Usuarios() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Carrera
+                    Carreras a su cargo
                   </label>
-                  <select
-                    value={form.id_carrera}
-                    onChange={e => setForm({ ...form, id_carrera: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#701330]/30 focus:border-[#701330] transition-all bg-white"
-                    disabled={guardando}
-                  >
-                    <option value="">Sin asignar</option>
-                    {carreras.map(c => (
-                      <option key={c.id} value={String(c.id)}>{c.nombre}</option>
-                    ))}
-                  </select>
+                  <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-3">
+                    {carreras.length === 0 && (
+                      <p className="text-sm text-gray-400">No hay carreras registradas</p>
+                    )}
+                    {carreras.map(c => {
+                      const idCarrera = String(c.id || c.id_carrera);
+                      const activa = form.carreras.includes(idCarrera);
+                      return (
+                        <label
+                          key={idCarrera}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none ${
+                            activa
+                              ? 'bg-[#701330]/5 border-[#701330]/40'
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={activa}
+                            onChange={() => toggleCarrera(idCarrera)}
+                            className="w-4 h-4 accent-[#701330]"
+                            disabled={guardando}
+                          />
+                          <span className="text-sm text-gray-800 flex-1">{c.nombre || c.nombre_carrera}</span>
+                          {(c.sigla) && (
+                            <span className="text-xs font-semibold text-[#701330] bg-[#701330]/5 px-2 py-0.5 rounded-md">{c.sigla}</span>
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1.5">Selecciona una o más carreras que el director tendrá a su cargo</p>
                 </div>
 
                 <div className="flex gap-3 pt-2">
